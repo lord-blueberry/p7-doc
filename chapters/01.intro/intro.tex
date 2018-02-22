@@ -1,5 +1,47 @@
-\section{Introduction}\label{intro}
+\section{Compressive Sensing and Solar Radio Astronomy}\label{intro}
+The study of solar Flares is interesting for Solar Astronomy. Solar Flares emit waves in the electromagnetic spectrum. High-Energy spectrum like X-Ray  closer to the sun. Radiowaves cannot be focused by a lense, therefore directly measuring the solar radio image is not possible.
+
+\subsection{Image Reconstruction of Radio Signals}
+Interferometer produce a ton of data. It does not observe the solar flares directly. It only observes a few frequencies in the radio spectrum. It would be interesting to know the image the instrument observed. In theory a inverse fourier transform would produce the observed image. In practice the instrument has too few frequency sample, the resulting image from the inverse transform alone is not useful.
+
+Nevertheless, the de-facto standard algorithms are all based on the inverse Fourier transform, but try to 'clean up' artifacts of the undersampled image like CLEAN \cite{hogbom1974aperture}. CLEAN assumes image should be a mixure of 2d gaussians. It masks artifacts which are implausible.
+
+Algorithm should produce high-resolution image from undersampled fourier components. Should be "fast", produce plausible images and "robust".
 
 \subsection{Why Compressive Sensing}
+\begin{equation}\label{fourier:reconstruction}
+\begin{split}
+Wx = y
+\end{split}
+\quad , \quad
+\begin{split}
+x &\in \mathcal{R}^n\\
+y &\in \mathcal{C}^m\\
+W &\in \mathcal{R}^{m \times n}
+\end{split}
+\end{equation}
 
-\subsection{Problems in Interferometry}
+Formalizing the reconstruction problem, we arrive at the simple Equation \eqref{fourier:reconstruction}. We want to reconstruct an image $x$, here represented as a vector of pixels. If we apply the Fourier Transform $W$ on the reconstructed image, we should arrive at the measured Fourier components $y$. We assume a noiseless environment for now. From linear algebra we know that there  exists a unique reconstruction if we have as many Fourier components as pixels. In this case, we want to reconstruct an image from fewer Fourier components, which leads to several possible solutions for \eqref{fourier:reconstruction}. The reconstruction algorithm therefore has to decide what is the most plausible reconstruction from all possible solutions. The question is therefore: What are the chances that the most plausible reconstruction equals the true image? Surprisingly the answer is, under the right conditions, we are virtually guaranteed to reconstruct the true image. What the conditions are and how one can reconstruct the most plausible image, that is the Theory of Compressive Sensing.
+
+\begin{equation}\label{cs:sparseland}
+\begin{split}
+x  =  D_{\alpha}
+\end{split}
+\quad , \quad
+\begin{split}
+x &\in \mathcal{R}^n\\
+\alpha &\in \mathcal{R}^k\\
+D &\in \mathcal{R}^{n \times k}
+\end{split}
+\quad with \quad
+\begin{split}
+n \ll k
+\end{split}
+\end{equation}
+
+Plausible Image, sparsity
+
+\begin{equation}\label{cs:noiseless}
+\tilde{\alpha} =  \underset{\alpha}{arg\: min}
+\end{equation}
+
