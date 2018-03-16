@@ -1,7 +1,31 @@
-\section{Compressive Sensing and Solar Radio Astronomy}\label{intro}
-The study of solar Flares is interesting for Solar Astronomy. Solar Flares emit waves in the electromagnetic spectrum. High-Energy spectrum like X-Ray  closer to the sun. Radiowaves cannot be focused by a lense, therefore directly measuring the solar radio image is not possible.
+\section{Interferometry and the Inverse Problem}\label{intro}
 
-\subsection{Image Reconstruction of Radio Signals}
+Single Dish antenna needs to be large. Large is expensive, therefore the radio astronomy builds interferometers that measure the fourier components of the sky. This leads to it's own set of problems, mainly calibrating the instrument and reconstructing the actual image the instrument has seen.
+
+At first glance, the image reconstruction does not seem hard. Since the interferometer measures Fourier components, one can calculate the inverse fourier transform. The Fourier Measures are incomplete, therefore only a "dirty" image can easily be retrieved. The CLEAN \cite{hogbom1974aperture} algorithm was created to clean up the dirty image and. Over the years the original CLEAN algorithm has been extended and modified, but the general idea stayed the same (Cotton Schwab CLEAN \cite{schwab1984relaxing}, MS-CLEAN \cite{rich2008multi}, MS-MFS-CLEAN\cite{rau2011multi})
+
+Future instruments like SKA produce much more data, the CLEAN class of algorithms does not scale well to the new sizes. Larger Interferometers break simplifying assumptions, like that the Fourier components are in fact 3 Dimensional.
+
+The theory of compressed sensing can produce a better reconstruction while reducing the wall-clock time. It can model the more complex effects of the RIME.
+
+The remainder of this chapter will introduce basics in Interferometry, the state of the art image reconstruction and an introduction to compressed sensing.
+
+Recent CS development Purify]
+
+\subsection{The UV Plane}
+
+The baseline, the distance between two antennas. The bigger the distance the higher the frequency it can measure.
+
+UV plane, how it looks and the earth rotation. Limitations, not in the center (because overlapping antennas), and not outside of earth.
+
+\subsubsection{The W component}
+
+(Direction Dependent Effects DDE)
+
+The RIME and Calibration?
+
+
+\subsection{Current State of Image Reconstruction}
 Interferometer produce a ton of data. It does not observe the solar flares directly. It only observes a few frequencies in the radio spectrum. It would be interesting to know the image the instrument observed. In theory a inverse fourier transform would produce the observed image. In practice the instrument has too few frequency sample, the resulting image from the inverse transform alone is not useful.
 
 Nevertheless, the de-facto standard algorithms are all based on the inverse Fourier transform, but try to 'clean up' artifacts of the undersampled image like CLEAN \cite{hogbom1974aperture}. CLEAN assumes image should be a mixure of 2d gaussians. It masks artifacts which are implausible.
@@ -21,7 +45,7 @@ W &\in \mathcal{R}^{m \times n}
 \end{split}
 \end{equation}
 
-Formalizing the reconstruction problem, we arrive at the simple Equation \eqref{fourier:reconstruction}. We want to reconstruct an image $x$, here represented as a vector of pixels. If we apply the Fourier Transform $W$ on the reconstructed image, we should arrive at the measured Fourier components $y$. We assume a noiseless environment for now. From linear algebra we know that there  exists a unique reconstruction if we have as many Fourier components as pixels. In this case, we want to reconstruct an image from fewer Fourier components, which leads to several possible solutions for \eqref{fourier:reconstruction}. The reconstruction algorithm therefore has to decide what is the most plausible reconstruction from all possible solutions. The question is therefore: What are the chances that the most plausible reconstruction equals the true image? Surprisingly the answer is, under the right conditions, we are virtually guaranteed to reconstruct the true image. What the conditions are and how one can reconstruct the most plausible image, that is the Theory of Compressive Sensing.
+Formalizing the reconstruction problem, we arrive at the simple Equation \eqref{fourier:reconstruction}. We want to reconstruct an image $x$, here represented as a vector of pixels. If we apply the Fourier Transform $W$ on the reconstructed image, we should arrive at the measured Fourier components $y$. We assume a noiseless environment for now. From linear algebra we know that there  exists a unique reconstruction if we have as many Fourier components as pixels. In this case, we want to reconstruct an image from fewer Fourier components, which leads to several possible solutions for \eqref{fourier:reconstruction}. The reconstruction algorithm therefore has to decide what is the most plausible reconstruction from all possible solutions. The question is therefore: What are the chances that the most plausible reconstruction equals the true image? Surprisingly the answer is, under the right conditions, we are virtually guaranteed to reconstruct the true image. What the conditions are and how one can reconstruct the most plausible image, that is the Theory of Compressive Sensing \cite{candes2006robust} \cite{donoho2006compressed}.
 
 \begin{equation}\label{cs:sparseland}
 \begin{split}
