@@ -1,22 +1,23 @@
 \section{Interferometry and the Inverse Problem}\label{intro}
+Single Dish antenna needs to be large. Large is expensive, therefore the radio astronomy builds interferometers that measure the Fourier components of the sky. This leads to it's own set of problems, mainly calibrating the instrument and reconstructing the actual image the instrument has seen.  Undersampled Fourier space. Finding the actual image is the Inverse Problem.
 
-Single Dish antenna needs to be large. Large is expensive, therefore the radio astronomy builds interferometers that measure the fourier components of the sky. This leads to it's own set of problems, mainly calibrating the instrument and reconstructing the actual image the instrument has seen.
-
-At first glance, the image reconstruction does not seem hard. Since the interferometer measures Fourier components, one can calculate the inverse fourier transform. The Fourier Measures are incomplete, therefore only a "dirty" image can easily be retrieved. The CLEAN \cite{hogbom1974aperture} algorithm was created to clean up the dirty image and. Over the years the original CLEAN algorithm has been extended and modified, but the general idea stayed the same (Cotton Schwab CLEAN \cite{schwab1984relaxing}, MS-CLEAN \cite{rich2008multi}, MS-MFS-CLEAN\cite{rau2011multi})
+At first glance, the image reconstruction does not seem hard. Since the interferometer measures Fourier components, one can calculate the inverse Fourier transform. The Fourier Measures are incomplete, therefore only a "dirty" image can easily be retrieved. The CLEAN \cite{hogbom1974aperture} algorithm was created to clean up the dirty image and. Over the years the original CLEAN algorithm has been extended and modified, but the general idea stayed the same (Cotton-Schwab-CLEAN \cite{schwab1984relaxing}, MS-CLEAN \cite{rich2008multi}, MS-MFS-CLEAN\cite{rau2011multi})
 
 Future instruments like SKA produce much more data, the CLEAN class of algorithms does not scale well to the new sizes. Larger Interferometers break simplifying assumptions, like that the Fourier components are in fact 3 Dimensional.
 
-The theory of compressed sensing can produce a better reconstruction while reducing the wall-clock time. It can model the more complex effects of the RIME.
+The theory of Compressed Sensing \cite{candes2006robust} \cite{donoho2006compressed} is another way of looking at the problem. It says we can fully reconstruct the true image if the signal is compressible.
 
-The remainder of this chapter will introduce basics in Interferometry, the state of the art image reconstruction and an introduction to compressed sensing.
-
-Recent CS development Purify]
+The remainder of this chapter will introduce basics in Interferometry, the state of the art image reconstruction and an introduction to compressed sensing. Active research field in radioastronomy. It tries to get an algorithm ready for SKA and different approaches get put forward(Purify, SASIR)
 
 \subsection{The UV Plane}
+
+From Antenna Configuration to UV-Coverage to Sampled-UV space
 
 The baseline, the distance between two antennas. The bigger the distance the higher the frequency it can measure.
 
 UV plane, how it looks and the earth rotation. Limitations, not in the center (because overlapping antennas), and not outside of earth.
+
+Undersampled by design, results in a Dirty Image.
 
 \subsubsection{The W component}
 
@@ -25,29 +26,44 @@ UV plane, how it looks and the earth rotation. Limitations, not in the center (b
 The RIME and Calibration?
 
 
-\subsection{Current State of Image Reconstruction}
-Interferometer produce a ton of data. It does not observe the solar flares directly. It only observes a few frequencies in the radio spectrum. It would be interesting to know the image the instrument observed. In theory a inverse fourier transform would produce the observed image. In practice the instrument has too few frequency sample, the resulting image from the inverse transform alone is not useful.
+\subsection{Deconvolution with CLEAN}
+\begin{equation}\label{intro:deconvolution}
+I \star PSF = I_D
+\end{equation}
+One way of solving the Inverse Problem is to formulate it as a deconvolution as in \eqref{intro:deconvolution}. The image $I$ is what the Interferometer would observe if the UV-Space was fully sampled. But since the UV-Space is undersampled, $I$ gets convolved with the Point Spread Function $PSF$ and the Interferometer observes the Fourier of components of the dirty Image $I_D$. After the Inverse Fourier Transform, the CLEAN algorithms deconvolve $I_D$ with the $PSF$ to find the actual Image.
 
-Nevertheless, the de-facto standard algorithms are all based on the inverse Fourier transform, but try to 'clean up' artifacts of the undersampled image like CLEAN \cite{hogbom1974aperture}. CLEAN assumes image should be a mixure of 2d gaussians. It masks artifacts which are implausible.
+Major and Minor Cycle,
 
-Algorithm should produce high-resolution image from undersampled fourier components. Should be "fast", produce plausible images and "robust".
+Good point source localization, trouble with extended sources, works solely in the image domain and does not "scale"
 
 \subsection{Why Compressive Sensing}
-\begin{equation}\label{fourier:reconstruction}
+
+\begin{equation}\label{intro:underdetermined}
 \begin{split}
-Wx = y
+Fx = y
 \end{split}
-\quad , \quad
 \begin{split}
 x &\in \mathcal{R}^n\\
 y &\in \mathcal{C}^m\\
-W &\in \mathcal{R}^{m \times n}
+2m &< n
 \end{split}
 \end{equation}
+Another way of looking at the inverse problem is to formulate it as the solution to an underdetermined system. \eqref{intro:underdetermined}. In our case, $y$ are the observed Fourier components, $x$ is the reconstructed image and $F$ is the Fourier Transform. We try to find $x$ that explain the observations $y$, but since it is an underdetermined system, there are multiple solutions. The intuitive way to solve it is to increase the number of observations until we have a fully-determined system. However, this is not necessary. With the theory of Compressive Sensing one can find the correct solution by exploiting the fact that $x$ is compressible.
 
-Formalizing the reconstruction problem, we arrive at the simple Equation \eqref{fourier:reconstruction}. We want to reconstruct an image $x$, here represented as a vector of pixels. If we apply the Fourier Transform $W$ on the reconstructed image, we should arrive at the measured Fourier components $y$. We assume a noiseless environment for now. From linear algebra we know that there  exists a unique reconstruction if we have as many Fourier components as pixels. In this case, we want to reconstruct an image from fewer Fourier components, which leads to several possible solutions for \eqref{fourier:reconstruction}. The reconstruction algorithm therefore has to decide what is the most plausible reconstruction from all possible solutions. The question is therefore: What are the chances that the most plausible reconstruction equals the true image? Surprisingly the answer is, under the right conditions, we are virtually guaranteed to reconstruct the true image. What the conditions are and how one can reconstruct the most plausible image, that is the Theory of Compressive Sensing \cite{candes2006robust} \cite{donoho2006compressed}.
+It turns out that many natural signals are compressible. A picture taken by an ordinary camera produces megabytes of data, but after compression only a fraction of the original need to stored. JPEG2000 uses the Wavelet Transform and only needs to store a limited number of Wavelet coefficients. More formally, if $W$ is the Wavelet transform and $e$ a natural Image, $We = \alpha$. $\alpha$ are the wavelet coefficients. Since natural images are compressible in the wavelet domain, $\alpha$ is sparse (contains mostly zeroes) and can be stored using less space than the image $e$.
 
-\begin{equation}\label{cs:sparseland}
+Coming back to the original underdetermined system \eqref{intro:underdetermined}, we introduce a Dictionary $D$ which contains our basis functions. We assume that $x$ is compressible using the Dictionary: $D\alpha = x$ and $\alpha$ has only a few non-zero entries. Instead of solving \eqref{intro:underdetermined} directly, we substitute $x$ with $D\alpha$ and search for the solution that has the fewest non-zero elements in $\alpha$. We arrive at the minimization problem \eqref{intro:ssparseland}, where $\mathit{ind}()$ is the indicator function. 
+
+S- Compressible. Under what circumstance is $D\tilde{\alpha} = x$. In compressed Sensing states that if we have a "good" dictionary, i.e. one where $x$. Also there are few limitations on $D$. It can be the Wavelet transform, Fourier Transform, or even a combination of the two.
+
+\begin{equation}\label{intro:ssparseland}
+\tilde{\alpha} =  \underset{\alpha}{arg min} \: \mathit{ind}(D\alpha) \quad s. t. \quad FD\alpha = y
+\end{equation}
+
+Non-convex optimization, real environment has noise. It can be shown that the L1 norm approximates the indicator function.
+
+
+\begin{equation}\label{intro:sparseland}
 \begin{split}
 x  =  D_{\alpha}
 \end{split}
