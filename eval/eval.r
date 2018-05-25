@@ -14,8 +14,11 @@ d = data.matrix(data)
 colnames(d) = 0:63
 rownames(d) = 0:63
 oldmargin = par()$mar
-par(mar=c(0,0,0,0))
+
 png("mytest.png")
+v <- 0.1
+lattice.options(axis.padding=list(factor=0.5))
+par(mar=c(0,0,0,0),plt=c(0,0,0,0),oma=c(0,0,0,0),cex.lab=v, cex=v,cex.axis=v, cex.main=v, cex.sub=v)
 levelplot(d,
           margin=FALSE,
           par.settings=list(
