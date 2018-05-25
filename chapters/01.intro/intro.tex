@@ -5,12 +5,12 @@ Each antenna pair, quadratic number of data points with the number of antennas: 
 
 (Future Interferometers like the Square Kilometer Array do introduce additional problems in the inverse Problem.)(Modelling the new effects)(while being able to handle the large amount of data.)
 
-% The Inverse Problem. Radio Astronomy has come up with the CLEAN class Algorithms\cite{hogbom1974aperture} \cite{schwab1984relaxing} \cite{rich2008multi}\cite{rau2011multi} that work well in practice for current radio interferometers.
+% The Inverse Problem. Radio Astronomy has come up with the CLEAN class Algorithms that work well in practice for current radio interferometers.
 %The theory of Compressed Sensing \cite{candes2006robust} \cite{donoho2006compressed}
 
 
 \subsection{Simplified Inverse Problem}
-For the current class of interferometers, retrieving the observed image of the sky is calculating the Inverse Fourier Transform of the measured Visibilities. (This is a simplification of the actual problem, which does not hold true for future instruments like SKA. How the Inverse Problem changes for future instruments is handled in section \ref{radio}). Since the Visibility Space is undersampled, the resulting image is 'dirty', as it contains effects from the instrument. The effects of the instrument can be modelled as a Point Spread Function (PSF). The Dirty Image is the Result of the True Image convolved with the PSF, $D_{True} \star PSF = D_{Dirty}$. Figure \ref{intro:inverse_problem} shows an example of the PSF, Dirty Image and True Image.  Since only the PSF and the Dirty Image are known, one tries to deconvolve the Dirty Image and retrieve the True Image.
+For the current class of interferometers, retrieving the observed image of the sky is calculating the Inverse Fourier Transform of the measured Visibilities. (This is a simplification of the actual problem, which does not hold true for future instruments like SKA. How the Inverse Problem changes for future instruments is handled in section \ref{radio}). Since the Visibility Space is undersampled, the resulting image is 'dirty', as it contains effects from the instrument. The effects of the instrument can be modelled as a Point Spread Function (PSF). The Dirty Image is the Result of the True Image convolved with the PSF. Figure \ref{intro:inverse_problem} shows an example of the PSF, Dirty Image and True Image.
 \begin{figure}[h!]
 	\centering
 	\begin{subfigure}[b]{0.3\linewidth}
@@ -49,10 +49,22 @@ The Dirty Image is the result of the Inverse Fourier Transform, the PSF on the o
 	\label{intro:ANT_UV_PSF}
 \end{figure}
 
-Each antenna pair samples a point in the UV Space. The distance between the antenna pair is called the baseline. Shorter baselines sample UV-Points closer to the center, while longer baselines sample points further away.  Each point in the UV Space represents a frequency Visibilities of the observed image: High frequency components are located away from the center and low frequency components are towards the center. Since each antenna pair contributes a Visibility, an Interferometer of $N$ antennas measures $(N-1)/2$ Visibilities. The configuration of the antenna sets up which points are sampled in the UV Space. 
+Each antenna pair samples a point in the UV Space. The distance between the antenna pair is called the baseline. Shorter baselines sample UV-Points closer to the center, while longer baselines sample points further away.  Each point in the UV Space represents a frequency Visibilities of the observed image: High frequency components are located away from the center and low frequency components are towards the center. Since each antenna pair contributes a Visibility, an Interferometer of $N$ antennas measures $(N-1)/2$ Visibilities. The configuration of the antenna sets up which points are sampled in the UV Space. The PSF can be calculated by using the Inverse Fourier Transform on the UV-Space.
 
+Since the Dirty Image and the PSF are known, one needs to deconvolve the Dirty Image with the PSF and try to retrieve the True Image. More formally, it tries to find $X$ from the equation \eqref{intro:eq:deconvolve}. Since the environment is undersampled there are potentially multiple solutions. Furthermore the whole measurement is susceptible to noise $N$, even if there is a unique solution for $X$, it may not be the true image. 
+\begin{equation}\label{intro:eq:deconvolve}
+X \star PSF + N = D_{Dirty} 
+\end{equation}
 
 \subsection{Deconvolution with CLEAN}
+The CLEAN class of Algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are widely used in Radio Astronomy to tackle the Inverse Problem. First, it formulates \eqref{intro:eq:deconvolve} as an optimization problem  \eqref{intro:eq:clean}.
+
+\begin{equation}\label{intro:eq:clean}
+minimize \: \left \| D_{Dirty} - X \star PSF \right \|_2^2
+\end{equation}
+
+
+
 Clean follows from the simplified Inverse problem. The dirty image results from the True image getting convolved with the PSF. It searches to deconvolve the dirty image with the PSF and retrieve the actual sky image.
 
 \begin{figure}[h!]
