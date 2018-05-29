@@ -3,7 +3,7 @@ Radio Antennas in Astronomy require a sub-arcsecond angular resolution. For a si
 
 Each antenna pair, quadratic number of data points with the number of antennas: a lot of data)(An interferometer does not observe the image directly. Simplified, each antenna pair observes a Fourier component of the An Antenna Pair measures a fourier component of the image.) (If all the fourier components are measured, the observed image could be retrieved by calculating the inverse fourier transform. However, only a limited set of visibilites can be measured.)(Inverting the problem results in an image with artefacts (Dirty Image).) (Clean can solve it for the current class of interferometers)
 
-(Future Interferometers like the Square Kilometer Array do introduce additional problems in the inverse Problem.)(Modelling the new effects)(while being able to handle the large amount of data.)
+%(Future Interferometers like the Square Kilometer Array do introduce additional problems in the inverse Problem.)(Modelling the new effects)(while being able to handle the large amount of data.)
 
 % The Inverse Problem. Radio Astronomy has come up with the CLEAN class Algorithms that work well in practice for current radio interferometers.
 %The theory of Compressed Sensing \cite{candes2006robust} \cite{donoho2006compressed}
@@ -51,35 +51,33 @@ The Dirty Image is the result of the Inverse Fourier Transform, the PSF on the o
 
 Each antenna pair samples a point in the UV Space. The distance between the antenna pair is called the baseline. Shorter baselines sample UV-Points closer to the center, while longer baselines sample points further away.  Each point in the UV Space represents a frequency Visibilities of the observed image: High frequency components are located away from the center and low frequency components are towards the center. Since each antenna pair contributes a Visibility, an Interferometer of $N$ antennas measures $(N-1)/2$ Visibilities. The configuration of the antenna sets up which points are sampled in the UV Space. The PSF can be calculated by using the Inverse Fourier Transform on the UV-Space.
 
-Since the Dirty Image and the PSF are known, one needs to deconvolve the Dirty Image with the PSF and try to retrieve the True Image. More formally, it tries to find $X$ from the equation \eqref{intro:eq:deconvolve}. Since the environment is undersampled there are potentially multiple solutions. Furthermore the whole measurement is susceptible to noise, even if there is a unique solution for $X$, it may not be the true image. 
+Since the Dirty Image and the PSF are known, one needs to deconvolve the Dirty Image with the PSF and try to retrieve the True Image. More formally, it tries to find $X$ from the equation \eqref{intro:eq:deconvolve} in a noiseless environment.
 
 \begin{equation}\label{intro:eq:deconvolve}
-X \star PSF = D_{Dirty} 
+X \star PSF = D_{dirty} 
 \end{equation}
+
 
 \subsection{Deconvolution with CLEAN}
-The CLEAN class of Algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are widely used in Radio Astronomy to tackle the Inverse Problem. 
-
-It searches the highest peak in the Dirty Image and subtracts the PSF at that point. It then continues with the second highest peak until a number of iterations or the a threshold. Formalizing this, it greedily minimizes the optimization function \eqref{intro:eq:clean}. Each iteration it tries to searches which pixel reduces the objective function the most.
+The CLEAN class of Algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are widely used in Radio Astronomy. It does not solve the deconvolution problem \eqref{intro:eq:deconvolve} directly. Instead, it minimizes a similar optimization problem with the objective  \eqref{intro:eq:clean}. In each iteration, CLEAN searches the highest peak in $D_{dirty}$ and removes a fraction of the PSF at that point. It is a greedy optimizes the objective \eqref{intro:eq:clean}. It is easy to show that if CLEAN minimizes the objective to zero, then it has found a solution for the original problem \eqref{intro:eq:deconvolve}. 
 
 \begin{equation}\label{intro:eq:clean}
-\underset{X}{minimize} \: \left \| D_{Dirty} - X \star PSF \right \|_2^2
+\underset{X}{minimize} \: \left \| D_{dirty} - X \star PSF \right \|_2^2
 \end{equation}
 
-It is easy to see that if the objective is minimized to zero, then the $X$ of the optimization formula is a solution for our original deconvolution problem \eqref{intro:eq:deconvolve}. However, CLEAN stops before the global optimum is reached.
+In a noiseless environment, the true image would be located where the objective of \eqref{intro:eq:clean} is zero. In practice, minimizing to zero is not desired. Noise corrupts the problem, the true image may not be located at a zero point any more. CLEAN therefore stops before it reaches an optima, either by limiting the number of iterations, or by stopping when the peak is below a threshold.
 
-
-Clean follows from the simplified Inverse problem. The dirty image results from the True image getting convolved with the PSF. It searches to deconvolve the dirty image with the PSF and retrieve the actual sky image.
-
-Clean implementation, removing the biggest peak. Early stopping
+CLEAN does not retrieve the true image, it approximates the true image by stopping early. Note that even in a noiseless environment, CLEAN would not retrieve the true image. Since the whole problem is undersampled, there are multiple $X$ for which the objective is zero. CLEAN has no mechanism to distinguish a candidate solution from the true image.
 
 
 \subsection{From CLEAN to Compressed Sensing}
+Under the Nyquist-Shannon sampling theorem, there was no mechanism to distinguish all possible solutions for \eqref{intro:eq:deconvolve} from the true image. The only way was to increase the number of measurements, until the problem is fully sampled. Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} is a new sampling theorem that can retrieve the true image from undersampled measurements. The intuitive explanation is Compressed Sensing models our prior knowledge about the image. It exploits the prior knowledge to distinguish the true image from unlikely candidate solutions. Section \ref{cs} goes into more detail on how Compressed Sensing works.
 
-
-\begin{equation}\label{intro:eq:clean}
-\underset{X}{minimize} \: \left \| D_{Dirty} - X \star PSF \right \|_2^2 + \lambda \left \| p(X) \right \|_1
+\begin{equation}\label{intro:eq:csclean}
+\underset{X}{minimize} \: \left \| D_{dirty} - X \star PSF \right \|_2^2 \: + \: \lambda \left \| P(X) \right \|_1
 \end{equation}
+
+Compressed Sensing Strenth to model anything. \eqref{intro:eq:csclean} is CLEAN in the Compressed Sensing Framework. Addition of a 
 
 
 
