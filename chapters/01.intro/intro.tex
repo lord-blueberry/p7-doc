@@ -51,10 +51,10 @@ The Dirty Image is the result of the Inverse Fourier Transform, the PSF on the o
 
 Each antenna pair samples a point in the UV Space. The distance between the antenna pair is called the baseline. Shorter baselines sample UV-Points closer to the center, while longer baselines sample points further away.  Each point in the UV Space represents a frequency Visibilities of the observed image: High frequency components are located away from the center and low frequency components are towards the center. Since each antenna pair contributes a Visibility, an Interferometer of $N$ antennas measures $(N-1)/2$ Visibilities. The configuration of the antenna sets up which points are sampled in the UV Space. The PSF can be calculated by using the Inverse Fourier Transform on the UV-Space.
 
-Since the Dirty Image and the PSF are known, one needs to deconvolve the Dirty Image with the PSF and try to retrieve the True Image. More formally, it tries to find $X$ from the equation \eqref{intro:eq:deconvolve} in a noiseless environment.
+Since the Dirty Image and the PSF are known, one needs to deconvolve the Dirty Image with the PSF and try to retrieve the True Image. More formally, it tries to find $x$ from the equation \eqref{intro:eq:deconvolve} in a noiseless environment.
 
 \begin{equation}\label{intro:eq:deconvolve}
-X \star PSF = D_{dirty} 
+x \ast  PSF = D_{dirty} 
 \end{equation}
 
 
@@ -62,22 +62,42 @@ X \star PSF = D_{dirty}
 The CLEAN class of Algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are widely used in Radio Astronomy. It does not solve the deconvolution problem \eqref{intro:eq:deconvolve} directly. Instead, it minimizes a similar optimization problem with the objective  \eqref{intro:eq:clean}. In each iteration, CLEAN searches the highest peak in $D_{dirty}$ and removes a fraction of the PSF at that point. It is a greedy optimizes the objective \eqref{intro:eq:clean}. It is easy to show that if CLEAN minimizes the objective to zero, then it has found a solution for the original problem \eqref{intro:eq:deconvolve}. 
 
 \begin{equation}\label{intro:eq:clean}
-\underset{X}{minimize} \: \left \| D_{dirty} - X \star PSF \right \|_2^2
+\underset{x}{minimize} \: \left \| D_{dirty} - x \ast PSF \right \|_2^2
 \end{equation}
 
-In a noiseless environment, the true image would be located where the objective of \eqref{intro:eq:clean} is zero. In practice, minimizing to zero is not desired. Noise corrupts the problem, the true image may not be located at a zero point any more. CLEAN therefore stops before it reaches an optima, either by limiting the number of iterations, or by stopping when the peak is below a threshold.
+In a noiseless environment, the true image would be located where the objective of \eqref{intro:eq:clean} is zero. In the real world however noise corrupts the problem and the true image may not be at the minimum any more. To address this, CLEAN is stopped early either by limiting the number of iterations or when the peak is below a threshold. With the right parameters, CLEAN should stop at a plausible image before it reaches the global optimum. How to chose the parameters or how to decide if the reconstruction is plausible or not is left to the user. In the hands of experts, CLEAN can be tuned to produce good enough reconstructions for current interferometers. 
 
-CLEAN does not retrieve the true image, it approximates the true image by stopping early. Note that even in a noiseless environment, CLEAN would not retrieve the true image. Since the whole problem is undersampled, there are multiple $X$ for which the objective is zero. CLEAN has no mechanism to distinguish a candidate solution from the true image.
+The CLEAN objective \eqref{intro:eq:clean} just forces the reconstruction to be close to the observation. It does not penalize reconstructions which are physically impossible and therefore cannot be the true image. The objective just has a data term. The regularization is left to the user. 
 
 
 \subsection{From CLEAN to Compressed Sensing}
-Under the Nyquist-Shannon sampling theorem, there was no mechanism to distinguish all possible solutions for \eqref{intro:eq:deconvolve} from the true image. The only way was to increase the number of measurements, until the problem is fully sampled. Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} is a new sampling theorem that can retrieve the true image from undersampled measurements. The intuitive explanation is Compressed Sensing models our prior knowledge about the image. It exploits the prior knowledge to distinguish the true image from unlikely candidate solutions. Section \ref{cs} goes into more detail on how Compressed Sensing works.
+In the Compressed Sensing Framework, the objective function is split into a data and a regularization term. The data term forces the reconstruction to be close to the observation, and the regularization forces the reconstruction to be plausible. CLEAN can be converted to compressed sensing by adding a regularization term to the objective and create a new objective function \eqref{intro:eq:csclean}. the new term $P(x)$ encodes our prior knowledge about the image while $\lambda$ controls how important each term is. If there is a less noise in the measurements, we want less regularization.
 
 \begin{equation}\label{intro:eq:csclean}
-\underset{X}{minimize} \: \left \| D_{dirty} - X \star PSF \right \|_2^2 \: + \: \lambda \left \| P(X) \right \|_1
+\underset{x}{minimize} \: \left \| D_{dirty} - x \ast PSF \right \|_2^2 \: + \: \lambda \left \| P(x) \right \|_1
 \end{equation}
 
+It has a global minimum.
+
+With the addition of noise, the true image is may not be at the minimum of the CLEAN objective function \eqref{intro:eq:clean}. With expert knowledge CLEAN can be tuned so it stops at a plausible image before it reaches the global minimum. If the expert knowledge could be encoded in the algorithm, it could find \textit{the most plausible} image given \textit{the observation}. The Compressed Sensing Framework allows us to do exactly that: encode our prior knowledge about the image and find the most plausible image.
+
+
+CLEAN  can be converted into the Compressed Sensing Framework by adding an additional term and we arrive at our new objective function \eqref{intro:eq:csclean}. It consists of the original term $\: \left \| D_{dirty} - x \ast PSF \right \|_2^2$, which says our reconstruction $x$ needs to be as consistent with the observation as possible, and an 
+
+
+
+Now the objective 
+
+
+
+Under the Nyquist-Shannon sampling theorem, there is no mechanism to distinguish all possible solutions for \eqref{intro:eq:clean} from the true image. The only way was to increase the number of measurements until the problem is fully sampled. Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} is a new sampling theorem that can retrieve the true image from undersampled measurements. It exploits prior knowledge to distinguish the true image from unlikely candidate solutions. CLEAN objective \eqref{intro:eq:clean} Section \ref{cs} goes into more detail on how Compressed Sensing works.
+
+
+
+The 
 Compressed Sensing Strenth to model anything. \eqref{intro:eq:csclean} is CLEAN in the Compressed Sensing Framework. Addition of a 
+
+
 
 
 
