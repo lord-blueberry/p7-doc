@@ -14,15 +14,15 @@ For the current class of interferometers, retrieving the observed image of the s
 \begin{figure}[h!]
 	\centering
 	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth]{./chapters/01.intro/img/PSF.png}
+		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/01.intro/img/psf.png}
 		\caption{Point Spread Function (PSF)}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth]{./chapters/01.intro/img/PSF.png}
+		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/01.intro/img/psf.png}
 		\caption{Dirty Image}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth]{./chapters/01.intro/img/PSF.png}
+		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/01.intro/img/true_image.png}
 		\caption{True Image}
 	\end{subfigure}
 	\caption{The Inverse Problem: Finding the true image of the sky when only the PSF and the observed image are known.}
@@ -34,16 +34,16 @@ The Dirty Image is the result of the Inverse Fourier Transform, the PSF on the o
 \begin{figure}[h!]
 	\centering
 	\begin{subfigure}[b]{0.3\linewidth}
-		 \includegraphics[width=\linewidth, trim={16px 16px 16px 16px}, clip]{./chapters/01.intro/img/mytest.png}
+		 \includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/01.intro/img/antennas.png}
 		 \caption{Antenna Configuration}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth]{./chapters/01.intro/img/PSF.png}
+		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/01.intro/img/uv.png}
 		\caption{UV Space}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.3\linewidth}
-	\includegraphics[width=\linewidth]{./chapters/01.intro/img/PSF.png}
-	\caption{Point Spread Function (PSF)}
+		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/01.intro/img/psf.png}
+		\caption{Point Spread Function (PSF)}
 	\end{subfigure}
 	\caption{The Antenna Configuration sets up the UV Space. The UV Space dictates the PSF.}
 	\label{intro:ANT_UV_PSF}
@@ -51,10 +51,10 @@ The Dirty Image is the result of the Inverse Fourier Transform, the PSF on the o
 
 Each antenna pair samples a point in the UV Space. The distance between the antenna pair is called the baseline. Shorter baselines sample UV-Points closer to the center, while longer baselines sample points further away.  Each point in the UV Space represents a frequency Visibilities of the observed image: High frequency components are located away from the center and low frequency components are towards the center. Since each antenna pair contributes a Visibility, an Interferometer of $N$ antennas measures $(N-1)/2$ Visibilities. The configuration of the antenna sets up which points are sampled in the UV Space. The PSF can be calculated by using the Inverse Fourier Transform on the UV-Space.
 
-Since the Dirty Image and the PSF are known, one needs to deconvolve the Dirty Image with the PSF and try to retrieve the True Image. More formally, it tries to find $x$ from the equation \eqref{intro:eq:deconvolve} in a noiseless environment.
+Since the Dirty Image and the PSF are known, one needs to deconvolve the Dirty Image with the PSF and try to retrieve the True Image. More formally, it tries to find $X$ from the equation \eqref{intro:eq:deconvolve} in a noiseless environment.
 
 \begin{equation}\label{intro:eq:deconvolve}
-x \ast  PSF = D_{dirty} 
+X \ast  PSF = D_{dirty} 
 \end{equation}
 
 
@@ -62,7 +62,7 @@ x \ast  PSF = D_{dirty}
 The CLEAN class of Algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are widely used in Radio Astronomy. It does not solve the deconvolution problem \eqref{intro:eq:deconvolve} directly. Instead, it minimizes a similar optimization problem with the objective  \eqref{intro:eq:clean}. In each iteration, CLEAN searches the highest peak in $D_{dirty}$ and removes a fraction of the PSF at that point. It is a greedy optimizes the objective \eqref{intro:eq:clean}. It is easy to show that if CLEAN minimizes the objective to zero, then it has found a solution for the original problem \eqref{intro:eq:deconvolve}. 
 
 \begin{equation}\label{intro:eq:clean}
-\underset{x}{minimize} \: \left \| D_{dirty} - x \ast PSF \right \|_2^2
+\underset{X}{minimize} \: \left \| D_{dirty} - X \ast PSF \right \|_2^2
 \end{equation}
 
 In a noiseless environment, the true image would be located where the objective of \eqref{intro:eq:clean} is zero. In the real world however noise corrupts the problem and the true image may not be at the minimum any more. To address this, CLEAN is stopped early either by limiting the number of iterations or when the peak is below a threshold. With the right parameters, CLEAN should stop at a plausible image before it reaches the global optimum. How to chose the parameters or how to decide if the reconstruction is plausible or not is left to the user. In the hands of experts, CLEAN can be tuned to produce good enough reconstructions for current interferometers. 
@@ -74,7 +74,7 @@ The CLEAN objective \eqref{intro:eq:clean} just forces the reconstruction to be 
 In the Compressed Sensing Framework, the objective function is split into a data and a regularization term. The data term forces the reconstruction to be close to the observation, and the regularization forces the reconstruction to be plausible. CLEAN can be converted to compressed sensing by adding a regularization term to the objective and create a new objective function \eqref{intro:eq:csclean}. the new term $P(x)$ encodes our prior knowledge about the image while $\lambda$ controls how important each term is. If there is a less noise in the measurements, we want less regularization.
 
 \begin{equation}\label{intro:eq:csclean}
-\underset{x}{minimize} \: \left \| D_{dirty} - x \ast PSF \right \|_2^2 \: + \: \lambda \left \| P(x) \right \|_1
+\underset{X}{minimize} \: \left \| D_{dirty} -X \ast PSF \right \|_2^2 \: + \: \lambda \left \| PX \right \|_1
 \end{equation}
 
 It has a global minimum.
@@ -136,9 +136,4 @@ n \ll k
 \end{split}
 \end{equation}
 
-Plausible Image, sparsity
-
-\begin{equation}\label{cs:noiseless}
-\tilde{\alpha} =  \underset{\alpha}{arg\: min}
-\end{equation}
 

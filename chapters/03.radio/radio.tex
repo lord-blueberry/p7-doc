@@ -16,15 +16,15 @@ V is what we measure, X is the image. calculating X is the inverse fourier trans
 \end{figure}
 
 \begin{equation}\label{radio:eq:ft}
-V(u, v) = \int\int X(x, y) e^{2 \pi i (ux+vy+ w\sqrt{1 - x^2 - y ^2})} \frac{dx dy}{\sqrt{1 - x^2 - y ^2}}
+V(u, v, w) = \int\int X(x, y) e^{2 \pi i (ux+vy+ w\sqrt{1 - x^2 - y ^2})} \frac{dx dy}{\sqrt{1 - x^2 - y ^2}}
 \end{equation}
 
-for small field of view the term  $x^2 + y^2 << 1$ and therefore can be neglected. so we arrive at the 2d fourier transform. for wide field of view, the term.
+for small field of view the term  $x^2 + y^2 \ll 1$ and therefore can be neglected. so we arrive at the 2d fourier transform. for wide field of view, the term.
 
 "The field of view of a telescope is limited by the primary beams of the antennas. To map a region of sky where the emission is at a scale larger than the angular width of the primary beams, mosaicing needs to be done. This is discussed in the second part of this lecture."
 Phase 
 
-source : %http://www.gmrt.ncra.tifr.res.in/gmrt_hpage/Users/doc/WEBLF/LFRA/node125.html
+source \cite{lfraSchool}
 
 
 \subsection{Calibration}
