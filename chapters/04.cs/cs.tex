@@ -1,36 +1,24 @@
 \section{The Theory of Compressed Sensing} \label{cs}
 
-Compressible signal is handled, how it works and why it works. So w
-
-sampling theorem, s sparse signals need s samples which is far smaller than Nyquist Shannons Sampling Rate. Good part: sound theroy. Bad part: combinatorial in calculation. Worst case metrics, good average case metrics are still under research.
-
-More in depth discussion about
 
 
-\subsection{Modelling Signals}
-$P(X)$ compressible signals like wavelets. It works if the sparse 
-
-Idea of a dictionary, $X = D\alpha$
-Dictionary, over complete representations. What is possible depends on the objective function
-
-Finding a sparse space, can even be over complete and pretty much anything one wants.
 
 
 \subsection{Objective Function for Compressed Sensing}
 \begin{equation}\label{intro:eq:csclean}
-\underset{X}{minimize} \: \left \| D_{dirty} - X \ast PSF \right \|_2^2 \: + \: \lambda \left \| P(X) \right \|_1
+\underset{X}{minimize} \: \left \| D_{dirty} - X \star PSF \right \|_2^2 \: + \: \lambda \left \| PX \right \|_0
 \end{equation}
 L1 Relaxation of the Objective function
 \begin{equation} \label{cs:eq:actual}
-\underset{X}{minimize} \: \left \| D_{dirty} - x \ast PSF \right \|_2^2 + \lambda \: indicator(P(X))
+\underset{X}{minimize} \: \left \| D_{dirty} - x \star PSF \right \|_2^2 + \lambda \: indicator(P(X))
 \end{equation}
 
 The actual CS formulation uses the indicator function for regularization. The indicator function is Zero for each element of $P(X)$ that is also zero, and 1 for each element that is not zero. This objective function \eqref{cs:eq:actual} is not Convex anymore. There are specialized optimization algorithms that minimize the objective \eqref{cs:eq:actual} like Matching Pursuit. 
 
 Another solution is to use the L1 Relaxation instead of the indicator function. Convex Problem. And all the problems were solved.
-
-
 Reconstruction in different spaces
+
+
 \begin{equation}
 \begin{split}
 D_{dirty} &= F^{-1}MV \\
@@ -39,8 +27,8 @@ X &= D\alpha
 \end{equation}
 
 \begin{alignat*}{2}
-	\underset{X}{minimize} \:& \left \| D_{dirty} - X \ast PSF \right \|_2^2 &&+  \lambda \left \| D^{-1}X \right \|_1 \\
-	\underset{\alpha}{minimize} \:& \left \| D_{dirty} - D\alpha \ast PSF \right \|_2^2 &&+ \lambda \left \| \alpha \right \|_1 \\
+	\underset{X}{minimize} \:& \left \| D_{dirty} - X \star PSF \right \|_2^2 &&+  \lambda \left \| D^{-1}X \right \|_1 \\
+	\underset{\alpha}{minimize} \:& \left \| D_{dirty} - D\alpha \star PSF \right \|_2^2 &&+ \lambda \left \| \alpha \right \|_1 \\
 	\underset{V_2}{minimize} \:& \left \| D_{dirty} - F^{-1} M V_2 \right \|_2^2 &&+ \lambda \left \| D^{-1}F^{-1}V_2\right \|_1 \\
 	\underset{V_2}{minimize} \:& \left \| V - M V_2 \right \|_2^2 &&+ \lambda \left \| D^{-1}F^{-1}V_2\right \|_1
 \end{alignat*}
@@ -48,6 +36,10 @@ X &= D\alpha
 All these equations should produce the same result in theory. In practice these different approaches have implications on the model and the chosen optimization algorithm. Not every $D^{-1}$ is well-defined. Coordinate descent works well on minimizing in the sparse space $\alpha$ directly. Also the convolution has to be explicitly handled when reconstructing in the image space.
 
 L2 norm in the Image space weights more heavily on the lower frequency components.
+
+\subsection{Modelling Signals}
+
+
 
 \subsection{Optimization Algorithms}
 
