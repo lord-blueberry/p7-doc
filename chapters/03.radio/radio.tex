@@ -1,25 +1,35 @@
 \section{Interferometry and the actual Inverse Problem} \label{radio}
+So far the simplified inverse problem has been introduced. Each antenna pair measures a Fourier Component of the sky brightness distribution. The distance between antenna pairs dictates what point is sampled in the UV plane. This leads to the measurement equation \eqref{radio:eq:2dft}. Calculating the true image $X$ is simply inverting the two dimensional Fourier Transform.
 
-The simplified inverse Problem says that each antenna pair measures a Fourier Component (Visibility) of the sky. 
 \begin{equation}\label{radio:eq:2dft}
 V(u, v) = \int\int X(x, y) e^{2 \pi i (ux+vy)} dx dx
 \end{equation}
 
-But that is not true, the UV space actually has a third component W. image \ref{radio:uvw} shows it. W is a vector in the direction of the science target.
-V is what we measure, X is the image. calculating X is the inverse fourier transform.
-
-\begin{figure}[h!] 
+\begin{wrapfigure}{r}{0.5\textwidth}
+	\vspace{-15pt}
 	\centering
-	\includegraphics[width=0.6\linewidth]{./chapters/03.radio/uvw.png}
+	\includegraphics[width=0.9\linewidth]{./chapters/03.radio/uvw.png}
 	\caption{U V and W coordinate space}
 	\label{radio:uvw}
-\end{figure}
+	\vspace{-10pt}
+\end{wrapfigure}
 
-\begin{equation}\label{radio:eq:ft}
-V(u, v, w) = \int\int X(x, y) e^{2 \pi i (ux+vy+ w\sqrt{1 - x^2 - y ^2})} \frac{dx dy}{\sqrt{1 - x^2 - y ^2}}
+In reality, each visibility has a third component $w$. It comes from the fact that the antennas are not on a flat plane but on the curved surface of the earth. Image \ref{radio:uvw} shows the three dimensional space. $w$ is the vector points from the phase center to the science target. For small Field of Views, the effect is negligible and the measurement equation \eqref{radio:eq:2dft} is a good approximation. The field of view is limited by the primary beam of the antennas. Primary beam widens with wavelength. So far, wide Field of View problems were encountered in low frequencies like LOFAR.
+
+
+new instruments like SKA, ASKAP and Pathfinder are constructed with a wide Field of View in mind. The simple two dimensional Fourier Transform does not hold true anymore and we arrive at the wide Field of View measurement equation \eqref{radio:eq:ftSphere}.
+
+\begin{equation}\label{radio:eq:ftSphere}
+V(u, v, w) = \int\int \frac{X(x, y)}{\sqrt{1 - x^2 - y ^2}} e^{2 \pi i (ux+vy+ w\sqrt{1 - x^2 - y ^2})}dx dy
 \end{equation}
 
-for small field of view the term  $x^2 + y^2 \ll 1$ and therefore can be neglected. so we arrive at the 2d fourier transform. for wide field of view, the term.
+Note that for small Field of View $1 - x^2 -y ^2 \ll 1$, and equation \eqref{radio:eq:ftSphere} can be approximated by the 2d Fourier Transform \eqref{radio:eq:2dft}. Two separate effects: $w$ Component for non coplanar baselines.
+
+W-Projection \cite{cornwell2008noncoplanar}
+
+A-Projection \cite{tasse2013applying}
+
+All here to try to get back to the 2d fourier transform. 
 
 "The field of view of a telescope is limited by the primary beams of the antennas. To map a region of sky where the emission is at a scale larger than the angular width of the primary beams, mosaicing needs to be done. This is discussed in the second part of this lecture."
 Phase 
@@ -27,9 +37,12 @@ Phase
 source \cite{lfraSchool}
 
 
+Strength of compressed sensing is modelling these effects.
+
 \subsection{Calibration}
 A lot of effects, weather, noise, antenna temperature, drift.
 
 Antenna based calibration, holds true for current interferometers but is not true for SKA. Possible switch to baseline based calibration.
 
-Self-cal?
+\subsubsection{Self-Calibration}
+?
