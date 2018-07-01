@@ -20,7 +20,7 @@ From compression algorithm, we assume there is a Prior $P$ in which our signal c
 	\end{split}
 \end{equation}
 
-Pictures of nature scenes for example tend to be sparse in the wavelet domain. If $x$ in \eqref{cs:eq:sparseDic} are nature scenes, we can create a Dictionary $Dic$ of wavelets. A single image $x$ then consists out of a combination of a few wavelets, meaning the number of non-zero entries is far lower than the number of pixels $n$.
+Pictures of nature scenes for example tend to be sparse in the wavelet domain. If $x$ in \eqref{cs:eq:sparseDic} are nature scenes, we can create a Dictionary $Dic$ of wavelets. A single image $x$ then consists a few wavelets, meaning the number of non-zero entries in $\alpha$ is far lower than the number of pixels $n$.
 
 Noise tends to affect all entries of the Dictionary. Sparseland Prior has had success in image denoising.
 
@@ -36,37 +36,37 @@ Surprisingly, the answer is yes, there is a way. The space in which we measure o
 
 Random Projections are not possible, the Interferometer measures complex visibilities. Antenna configuration could help. But luckily what also can help is the Wide Field imaging. McEwen \cite{mcewen2011compressed} showed the theoretical improvement on synthetic data.
 
+CS does not need an over-complete dictionary. It can also work for wavelet domains. overcomplete dictionaries give more freedom in representation.
+
 $P$ in our original objective function. $Dic = P^{-1}$. So if the conversion from image space to Sparseland is only defined when the dictionary is a square matrix. When it has as many signal parts as pixels. The Objective Function can be modified to work with over-complete dictionaries.
 
 
 \subsection{Objective Function}
-L0 norm is not technically a norm. The problem is not convex.
+The Compressed Sensing CLEAN objective function \eqref{intro:eq:csclean} uses the L0 norm for it's regularization term, which means the Objective Function is not convex. There are specialized solvers for the L0 compressed sensing. The L1 relaxation however is practically guaranteed to have the same minimum as the L0 norm and results in a convex objective function. Since GuRoBi works better on the L1 relaxation it was chosen for this project.
 
-L1 Relaxation of the Objective function
-\begin{equation} \label{cs:eq:l1}
-\underset{X}{minimize} \: \left \| D_{dirty} - X \star PSF \right \|_2^2 \: + \: \lambda \left \| PX \right \|_1
-\end{equation}
-
-The actual CS formulation uses the indicator function for regularization. The indicator function is Zero for each element of $P(X)$ that is also zero, and 1 for each element that is not zero. This objective function \eqref{cs:eq:actual} is not Convex anymore. There are specialized optimization algorithms that minimize the objective \eqref{cs:eq:actual} like Matching Pursuit. 
-
-\begin{equation}
-	\begin{split}
-		PSF = F^{-1}M
-		D_{dirty} &= F^{-1}MV \\
-		X &= Dic\:\alpha
-	\end{split}
-\end{equation}
+As for the objective function, there are three different spaces in which one might want to reconstruct: The analysis method, where the image $x$ is minimized directly, the synthesis method where the sparse vector $\alpha$ is minimized, or by in-painting the missing Visibilities $V_2$.
 
 \begin{alignat*}{2}
-	\underset{X}{minimize} \:& \left \| D_{dirty} - X \star PSF \right \|_2^2 &&+  \lambda \left \| P^{-1}X \right \|_1 \\
-	\underset{\alpha}{minimize} \:& \left \| D_{dirty} - P\alpha \star PSF \right \|_2^2 &&+ \lambda \left \| \alpha \right \|_1 \\
-	\underset{V_2}{minimize} \:& \left \| D_{dirty} - F^{-1} M V_2 \right \|_2^2 &&+ \lambda \left \| P^{-1}F^{-1}V_2\right \|_1 \\
-	\underset{V_2}{minimize} \:& \left \| V - M V_2 \right \|_2^2 &&+ \lambda \left \| P^{-1}F^{-1}V_2\right \|_1
+	analysis:\qquad \underset{x}{minimize} \:& \left \| D_{dirty} - x \star PSF \right \|_2^2 &&+  \lambda \left \| Px \right \|_1 \\
+	synthesis:\qquad \underset{\alpha}{minimize} \:& \left \| D_{dirty} - Dic \: \alpha \star PSF \right \|_2^2 &&+ \lambda \left \| \alpha \right \|_1 \\
+	in-painting:\qquad \underset{V_2}{minimize} \:& \left \| D_{dirty} - F^{-1} M V_2 \right \|_2^2 &&+ \lambda \left \| PF^{-1}V_2\right \|_1
 \end{alignat*}
 
-All these equations should produce the same result in theory. In practice these different approaches have implications on the model and the chosen optimization algorithm. Not every $D^{-1}$ is defined. Coordinate descent works well on minimizing in the sparse space $\alpha$ directly. Also the convolution has to be explicitly handled when reconstructing in the image space.
+All three objective functions have the same global minimum. For the second and third objective $x$ can be retrieved by $x = Dic\:\alpha$ and by $x = F^{-1}V_2$ respectively. [Empirical and theoretical studies have shown an advantage of the analysis objective over the other two \cite{something}]. However practical considerations play a factor. $Px = \alpha$ is only true $P$ is an orthogonal transformation like the wavelet transform. Over-complete dictionaries would result in $P \in \mathbb{R}^{m*n}, n \ll m$ and may not produce a suitably sparse vector $\alpha$. Therefore over-complete prior tend to use the synthesis objective, since it only requires a transformation from sparse to image space($x = Dic\:\alpha$).
 
-L2 norm in the Image space weights more heavily on the lower frequency components.
+It is a similar story with in-painting: the transformation $Px2$ may be eaier represented in the fourier space, especially when $P$ contains a convolution.
+
+The strength of Compressed Sensing is that the objective can be modified for the measurement equation, while the Optimization Algorithm and the Prior stay the same. The above objective functions represent the deconvolution problem which is only true for small Field of View imaging. 
+
+Either A- and W-Projections are used to transform the wide FoV measurement equation \eqref{radio:eq:ftSphere} back to the deconvolution. Or the measurement equation \eqref{radio:eq:ftSphere} gets included in the data term, resulting in the new objective \eqref{cs:eq:wfield}.
+
+\begin{equation}\label{cs:eq:wfield}
+	\underset{x}{minimize} \: \left \| V - MF_{wFOV}^{-1}x \right \|_2^2 + \lambda \left \| Px\right \|_1
+\end{equation}
+
+A lot of freedom to choose. 
+
+For this project CASA was used, which limits the choices.
 
 
 \subsubsection{Implementation In Casa}
