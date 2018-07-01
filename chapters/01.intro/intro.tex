@@ -67,14 +67,22 @@ CLEAN's regularization scheme is not ideal for extended sources. Ideally another
 
 
 \subsection{From CLEAN to Compressed Sensing}
-An Algorithm in the Compressed Sensing Framework has three components:
+With Compressed Sensing the regularization scheme is a seperate part of the overall approach. It consists of three separate parts:
 \begin{itemize}
 	\item An objective function with a data and regularization term
-	\item A Matrix $P$ in which the signal can be sparsely represented.
-	\item An optimization algorithm that is able to handle the objective function
+	\item A prior $P$ in which the signal can be sparsely represented.
+	\item An optimization algorithm that is suited for the objective function.
 \end{itemize}
 
-CLEAN can be converted into the Compressed Sensing Framework. First, the regularization term has to be explicit, it gets added to the objective function. The resulting objective \eqref{intro:eq:csclean} has two terms: A data term and a regularization term. The data term forces the reconstruction to be close to the measurement, while the regularization term forces the reconstruction to be plausible. $\lambda$ models the trade off between the terms. Note that the zero norm $\left \| PX \right \|_0$ acts as an indicator function and is not technically a norm.
+CLEAN can be converted into the Compressed Sensing Framework. The objective function needs two terms: A data term and a regularization term. The data term can be taken from the CLEAN objective \eqref{intro:eq:clean}, while a regularization term is added, resulting in the new objective \eqref{intro:eq:csclean}. The data term forces the reconstruction to be close to the measurement, while the regularization term forces the reconstruction to be plausible. $\lambda$ models the trade off between the terms. Note that the zero norm $\left \| PX \right \|_0$ acts as an indicator function and is not technically a norm, but the notation is common practice in the literature.
+
+Prior and pixels.
+
+
+while the early stopping regula regularization has The resulting objective \eqref{intro:eq:csclean} contains the data term from CLEAN and the regularization term is made explicit.  
+
+ 
+ The resulting objective has two terms: A data term and a regularization term. 
 
 \begin{equation}\label{intro:eq:csclean}
 \underset{X}{minimize} \: \left \| D_{dirty} -X \star PSF \right \|_2^2 \: + \: \lambda \left \| PX \right \|_0
