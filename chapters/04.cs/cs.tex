@@ -20,9 +20,9 @@ From compression algorithm, we assume there is a Prior $P$ in which our signal c
 	\end{split}
 \end{equation}
 
-Pictures of nature scenes for example tend to be sparse in the wavelet domain. If $x$ in \eqref{cs:eq:sparseDic} are nature scenes, we can create a Dictionary $Dic$ of wavelets. A single image $x$ then consists a few wavelets, meaning the number of non-zero entries in $\alpha$ is far lower than the number of pixels $n$.
+Pictures of nature scenes for example tend to be sparse in the wavelet domain. If $x$ in \eqref{cs:eq:sparseDic} are nature scenes, we can create a Dictionary $Dic$ of wavelets. A single image $x$ then consists a few wavelets, meaning the number of non-zero entries $s$ in $\alpha$ is far lower than the number of pixels $n$. $\alpha$ is $s$-sparse
 
-Noise tends to affect all entries of the Dictionary. Sparseland Prior has had success in image denoising.
+Noise tends to affect all entries of the Dictionary. Sparseland Prior has had success in image de-noising.
 
 The signal parts is not restricted to be in one domain. It can consists of wavelets, cosine functions, a combination of both, or any other function. 
 
@@ -35,6 +35,8 @@ But when we know it is a Sparseland signal and we know the Dictionary, we could 
 Surprisingly, the answer is yes, there is a way. The space in which we measure our signal $x$ should be incoherent from our Dictionary. With that we maximize the amount we learn about the non-zero components of $alpha$ with each measurement. Interestingly enough, constructing an incoherent measurement space is easy: Random projections are very good at being incoherent from the dictionary. 
 
 Random Projections are not possible, the Interferometer measures complex visibilities. Antenna configuration could help. But luckily what also can help is the Wide Field imaging. McEwen \cite{mcewen2011compressed} showed the theoretical improvement on synthetic data.
+
+How many samples are now needed? 
 
 CS does not need an over-complete dictionary. It can also work for wavelet domains. overcomplete dictionaries give more freedom in representation.
 

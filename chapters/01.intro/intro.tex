@@ -53,7 +53,7 @@ The PSF is surprisingly easy to calculate. The Fourier Transformed PSF equals th
 In each iteration of CLEAN, it searches the highest peak of the dirty image and removing a fraction of the PSF at that point. It stops until the next highest peak is below a threshold, or if the maximum number of iterations was reached. The fraction of the PSF, threshold and number of iterations are all tunable by the user. State of the art implementations expose even more parameters. The reconstruction quality depends on the chosen parameters and require extensive user input.
 
 %Convolved with the primary beam
-CLEAN does not solve the deconvolution problem \eqref{intro:eq:deconvolve} directly. Instead, it greedily minimizes the objective function \eqref{intro:eq:clean}. It is easy to see that if CLEAN minimizes the objective to zero, it has found a solution to the original deconvolution problem in a noiseless environment.
+CLEAN does not solve the deconvolution problem \eqref{intro:eq:deconvolve} directly. Instead, it greedily minimizes the objective \eqref{intro:eq:clean}. It is easy to see that if CLEAN minimizes the objective to zero, it has found a solution to the original deconvolution problem in a noiseless environment.
 
 \begin{equation}\label{intro:eq:clean}
 \underset{x}{minimize} \: \left \| I_{dirty} - x \star PSF \right \|_2^2
@@ -63,43 +63,46 @@ Since the original problem is ill-posed, the objective \eqref{intro:eq:clean} ma
 
 In short, CLEAN does a greedy approximation of the deconvolution problem, and assumes the resulting image consists out of a few point sources. The question remains, how close the CLEAN approximation is to the true image? If the true image consists out of a few point sources, CLEAN produces a good approximation. Extended emissions however are harder for CLEAN to reproduce. The peak of extended sources is lower than that of point sources. It is harder for CLEAN to distinguish extended sources from noise.
 
-CLEAN's regularization scheme is not ideal for extended sources. Ideally another way of regularization would be chosen for extended emissions, but the regularization is a fixed part of the CLEAN algorithm.
+The CLEAN regularization scheme is not ideal for extended sources. Ideally another way of regularization would be chosen for extended emissions, but the regularization is a fixed part of the CLEAN algorithm.
 
 
 \subsection{From CLEAN to Compressed Sensing}
-With Compressed Sensing the regularization scheme is a seperate part of the overall approach. It consists of three separate parts:
+With Compressed Sensing the regularization scheme is a separate part of the overall approach. It consists of three separate parts:
 \begin{itemize}
-	\item An objective function with a data and regularization term
+	\item An objective with a data and regularization term
 	\item A prior $P$ in which the signal can be sparsely represented.
-	\item An optimization algorithm that is suited for the objective function.
+	\item An optimization algorithm that is suited for the objective.
 \end{itemize}
 
-CLEAN can be converted into the Compressed Sensing Framework. The objective function needs two terms: A data term and a regularization term. The data term can be taken from the CLEAN objective \eqref{intro:eq:clean}, while a regularization term is added, resulting in the new objective \eqref{intro:eq:csclean}. The data term forces the reconstruction to be close to the measurement, while the regularization term forces the reconstruction to be plausible. $\lambda$ models the trade off between the terms. Note that the zero norm $\left \| PX \right \|_0$ acts as an indicator function and is not technically a norm, but the notation is common practice in the literature.
-
-Prior and pixels.
-
-
-while the early stopping regula regularization has The resulting objective \eqref{intro:eq:csclean} contains the data term from CLEAN and the regularization term is made explicit.  
-
- 
- The resulting objective has two terms: A data term and a regularization term. 
+CLEAN can be converted into a Compressed Sensing approach. The CLEAN objective consists only of a data term. By adding a regularization term, we arrive at the new Compressed Sensing CLEAN objective \eqref{intro:eq:csclean}. The data term forces the reconstruction to be close to the measurement, while the regularization term forces the reconstruction to be plausible. $\lambda$ models the expected noise in the problem. More noise needs more regularization, which needs a larger $\lambda$. Note that the zero norm $\left \| Px \right \|_0$ acts as an indicator function. 
 
 \begin{equation}\label{intro:eq:csclean}
-\underset{X}{minimize} \: \left \| D_{dirty} -X \star PSF \right \|_2^2 \: + \: \lambda \left \| PX \right \|_0
+	\underset{x}{minimize} \: \left \| D_{dirty} - x \star PSF \right \|_2^2 \: + \: \lambda \left \| Px \right \|_0
 \end{equation}
 
- the new objective is the Compressed Sensing version of CLEAN. It assumes that the reconstruction is sparse in the image domain. When $P$ is the identity matrix, This is true when there are only a few point sources located in the image. Extended sources are are not well represented and are harder to detect. 
- 
- The objective function is optimized by a greedy solver. 
+The next step is choosing a Prior $P$ that models the same regularization scheme. CLEAN assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image, the Prior $P$ in Compressed Sensing CLEAN is the identity matrix.
 
-in the compressed Sensing Framework CLEAN is
-a specific objective function
-with an identity matrix as prior
-and a specific optimization algorithm
+The last conversion step is choosing a similar optimization algorithm. In every iteration, CLEAN searches the highest peak in the dirty image. It is a greedy optimization scheme that is similar to Matching Pursuit.
 
-In this part, mostly the prior is 
+
+Both versions of CLEAN produce the same result, but we are getting rid of the tunable parameters in favour of a single $\lambda$. There exist schemes that estimate the correct $\lambda$ for a given problem.
+
+In the noisy environment the true image may not be located at a minimum of the CLEAN objective \eqref{intro:eq:clean}. The Compressed Sensing objective is guaranteed to have a unique global minimum and the true image is guaranteed to be there if:
+\begin{itemize}
+	\item The Prior models our signal well enough
+	\item Enough samples are available. 
+\end{itemize}
+
+How many samples are needed? Interestingly enough, we do not need the Nyquist-Shannon rate. It depends on the prior. 
+
+Same as clean, but now we have a global optimization scheme, the regularization is explicit and replaceable.
 
 The important questions are: In an undersampled, noisy environment, does the new objective \eqref{intro:eq:csclean} have a global minimum? What is the chances that the minimum is equal to the true image? It turns out that even though we have fewer samples than the Nyquist-Shannon Theorem requires, we can guarantee a global minimum and that the minimum is equal to the true image, if we have enough prior knowledge $P$ about the signal. How we model the signal and by extend, what $P$ we choose is essential for Compressed Sensing
+
+
+The data term is for small Field of View imaging, it can be modified to solve the wide Field of View problem.
+
+
 
 
 
