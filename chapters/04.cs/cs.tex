@@ -20,7 +20,7 @@ From compression algorithm, we assume there is a Prior $P$ in which our signal c
 	\end{split}
 \end{equation}
 
-Pictures of nature scenes for example tend to be sparse in the wavelet domain. If $x$ in \eqref{cs:eq:sparseDic} are nature scenes, we can create a Dictionary $Dic$ of wavelets. A single image $x$ then consists a few wavelets, meaning the number of non-zero entries $s$ in $\alpha$ is far lower than the number of pixels $n$. $\alpha$ is $s$-sparse
+In image compression this phenomenon was already observed: image depicting nature scenes tend to be sparse in the wavelet domain. . If $x$ in \eqref{cs:eq:sparseDic} are nature scenes, we can create a Dictionary $Dic$ of wavelets. A single image $x$ can be represented with a few wavelets, meaning the number of non-zero entries $s$ in $\alpha$ is far lower than the number of pixels $n$. All that is left to do for compression is save the non-zero entries of $\alpha$.
 
 Noise tends to affect all entries of the Dictionary. Sparseland Prior has had success in image de-noising.
 
@@ -54,7 +54,9 @@ As for the objective function, there are three different spaces in which one mig
 	in-painting:\qquad \underset{V_2}{minimize} \:& \left \| D_{dirty} - F^{-1} M V_2 \right \|_2^2 &&+ \lambda \left \| PF^{-1}V_2\right \|_1
 \end{alignat*}
 
-All three objective functions have the same global minimum. For the second and third objective $x$ can be retrieved by $x = Dic\:\alpha$ and by $x = F^{-1}V_2$ respectively. [Empirical and theoretical studies have shown an advantage of the analysis objective over the other two \cite{something}]. However practical considerations play a factor. $Px = \alpha$ is only true $P$ is an orthogonal transformation like the wavelet transform. Over-complete dictionaries would result in $P \in \mathbb{R}^{m*n}, n \ll m$ and may not produce a suitably sparse vector $\alpha$. Therefore over-complete prior tend to use the synthesis objective, since it only requires a transformation from sparse to image space($x = Dic\:\alpha$).
+All three objective functions have the same global minimum. For the second and third objective $x$ can be retrieved by $x = Dic\:\alpha$ and by $x = F^{-1}V_2$ respectively. [Empirical and theoretical studies have shown an advantage of the analysis objective over the other two \cite{something}]. 
+
+However practical considerations play a factor. $Px = \alpha$ is only true $P$ is an orthogonal transformation like the wavelet transform. Over-complete dictionaries would result in $P \in \mathbb{R}^{m*n}, n \ll m$ and may not produce a suitably sparse vector $\alpha$. Therefore over-complete prior tend to use the synthesis objective, since it only requires a transformation from sparse to image space($x = Dic\:\alpha$).
 
 It is a similar story with in-painting: the transformation $Px2$ may be eaier represented in the fourier space, especially when $P$ contains a convolution.
 

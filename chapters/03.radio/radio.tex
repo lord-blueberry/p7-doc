@@ -1,12 +1,17 @@
 \section{Inverse Problem for wide Field of View Imaging} \label{radio}
-So far the simplified inverse problem has been introduced. Each antenna pair measures a Fourier Component of the sky brightness distribution. The distance between antenna pairs dictates what point is sampled in the UV plane. This leads to the measurement equation \eqref{radio:eq:2dft}. Calculating the true image $X$ is simply inverting the two dimensional Fourier Transform.
+So far the small Field of View inverse problem has been introduced where each antenna pair measures a Visibility of the sky brightness distribution. This leads to the small Field of View measurement equation \eqref{radio:eq:2dft}. It is identical to the two dimensional Fourier Transform. In practice the Fast Fourier Transform is used which scales better on large problems.
 
 \begin{equation}\label{radio:eq:2dft}
-V(u, v) = \int\int X(x, y) e^{2 \pi i (ux+vy)} dx dx
+V(u, v) = \int\int x(l, m) e^{2 \pi i (ux+vy)} dl dm
+\end{equation}
+
+For wide Field of View imaging, two effects break the two dimensional Fourier Transform relationship: Non-coplanar Baselines and the celestial sphere which lead to the measurement equation \eqref{radio:eq:ftSphere}. Note that for small Field of View $1 - x^2 -y ^2 \ll 1$, and \eqref{radio:eq:ftSphere} reduces to the 2d measurement equation \eqref{radio:eq:2dft}. 
+
+\begin{equation}\label{radio:eq:ftSphere}
+	V(u, v, w) = \int\int \frac{X(x, y)}{\sqrt{1 - x^2 - y ^2}} e^{2 \pi i (ux+vy+ w\sqrt{1 - x^2 - y ^2})}dx dy
 \end{equation}
 
 \begin{wrapfigure}{r}{0.5\textwidth}
-	\vspace{-15pt}
 	\centering
 	\includegraphics[width=0.9\linewidth]{./chapters/03.radio/uvw.png}
 	\caption{U V and W coordinate space}
@@ -14,27 +19,34 @@ V(u, v) = \int\int X(x, y) e^{2 \pi i (ux+vy)} dx dx
 	\vspace{-10pt}
 \end{wrapfigure}
 
-In reality, each visibility has a third component $w$. It comes from the fact that the antennas are not on a flat plane but on the curved surface of the earth. Image \ref{radio:uvw} shows the three dimensional space. $w$ is the vector points from the phase center to the science target. For small Field of Views, the effect is negligible and the measurement equation \eqref{radio:eq:2dft} is a good approximation. The field of view is limited by the primary beam of the antennas. Primary beam widens with wavelength. So far, wide Field of View problems were encountered in low frequencies like LOFAR.
+Non-coplanar Baselines lead to a third component $w$ for each Visibility. Figure \ref{radio:uvw} shows the the $u$ $v$ and $w$ coordinate system. $w$ is essentially the pointing direction of the instrument. The UV-Plane is the projection of the antennas on a plane perpendicular to the pointing direction. Which point in the UV-Plane get sampled and what $w$ component it has depends on the pointing direction. If the instrument points straight up, the UV-Plane is a tangent to earth's surface, and the $w$ term compensates for earth's surface curvature. If however the instrument points at the horizon, the projected UV-Plane gets squashed and $w$ compensates for antennas which lie far behind the UV-Plane. In essence, $w$ is a phase delay that corrects antenna positions in three dimensions. The wide Field of View measurement equation \eqref{radio:eq:ftSphere} would account for the $w$ phase delay, but it breaks the the two dimensional Fourier relationship and the FFT cannot be used. The W-Projection \cite{cornwell2008noncoplanar} algorithm approximates the effect of the $w$ term restores the two dimensional Fourier relationship.
+
+
+
+Non-coplanar baselines, each Visibility has a $u$ and $v$ component. $u$ and $v$ are vectors on a plain. The plains normal points to the science target. 
+So far the simplified inverse problem has been introduced. Each antenna pair measures a Fourier Component of the sky brightness distribution. The distance between antenna pairs dictates what point is sampled in the UV plane. This leads to the measurement equation . Calculating the true image $X$ is simply inverting the two dimensional Fourier Transform.
+
+In reality, each visibility has a third component $w$. It comes from the fact that the antennas are not on a flat plane but on the curved surface of the earth. Image  shows the three dimensional space. $w$ is the vector points from the phase center to the science target. For small Field of Views, the effect is negligible and the measurement equation \eqref{radio:eq:2dft} is a good approximation. The field of view is limited by the primary beam of the antennas. Primary beam widens with wavelength. So far, wide Field of View problems were encountered in low frequencies like LOFAR.
 
 
 new instruments like SKA, ASKAP and Pathfinder are constructed with a wide Field of View in mind. The simple two dimensional Fourier Transform does not hold true anymore and we arrive at the wide Field of View measurement equation \eqref{radio:eq:ftSphere}.
 
-\begin{equation}\label{radio:eq:ftSphere}
-V(u, v, w) = \int\int \frac{X(x, y)}{\sqrt{1 - x^2 - y ^2}} e^{2 \pi i (ux+vy+ w\sqrt{1 - x^2 - y ^2})}dx dy
-\end{equation}
 
-Note that for small Field of View $1 - x^2 -y ^2 \ll 1$, and equation \eqref{radio:eq:ftSphere} can be approximated by the 2d Fourier Transform \eqref{radio:eq:2dft}. Two separate effects: $w$ Component for non coplanar baselines.
+ can be approximated by the 2d Fourier Transform \eqref{radio:eq:2dft}. Two separate effects: $w$ Component for non coplanar baselines.
 
-W-Projection \cite{cornwell2008noncoplanar}
+
 
 A-Projection \cite{tasse2013applying}
 
+spread spectrum phenomenon
+
 All here to try to get back to the 2d fourier transform. 
 
-"The field of view of a telescope is limited by the primary beams of the antennas. To map a region of sky where the emission is at a scale larger than the angular width of the primary beams, mosaicing needs to be done. This is discussed in the second part of this lecture."
-Phase 
+%"The field of view of a telescope is limited by the primary beams of the antennas. To map a region of sky where the emission is at a scale larger than the angular width of the primary beams, mosaicing needs to be done. This is discussed in the second part of this lecture."
 
-source \cite{lfraSchool}
+%Phase 
+
+%source \cite{lfraSchool}
 
 
 Strength of compressed sensing is modelling these effects.
