@@ -66,22 +66,22 @@ The CLEAN regularization scheme is not ideal for extended sources. Ideally anoth
 
 
 \subsection{From CLEAN to Compressed Sensing}
-With Compressed Sensing the regularization scheme is a separate part of the overall approach. It consists of three separate parts:
+In the Compressed Sensing Framework, an approach is split into three separate parts:
 \begin{itemize}
 	\item An objective with a data and regularization term
 	\item A prior $P$ in which the signal can be sparsely represented.
 	\item An optimization algorithm that is suited for the objective.
 \end{itemize}
 
-The separate parts have a degree of interchangeability. The prior can be exchanged while keeping the objective and the optimization algorithm, which was frequently done during the course of this project. However each part is not fully interchangeable. If the chosen objective is non-convex, it limits the available optimization algorithms. How each part influences each other is discussed in section \ref{cs}.
 
+The fra
 To demonstrate the flexibility of the Compressed Sensing Framework, we convert CLEAN into a Compressed Sensing approach. First we add a regularization term to \eqref{intro:eq:clean} and arrive at the new objective \eqref{intro:eq:csclean}. The objective contains the old CLEAN data term and a new regularization term. The data term forces the reconstruction to be close to the measurement, while the regularization term forces the reconstruction to be plausible. $\lambda$ models the expected noise in the problem. Note that the zero norm $\left \| Px \right \|_0$ acts as an indicator function. 
 
 \begin{equation}\label{intro:eq:csclean}
 	\underset{x}{minimize} \: \left \| D_{dirty} - x \star PSF \right \|_2^2 \: + \: \lambda \left \| Px \right \|_0
 \end{equation}
 
-Now  $P$ that models the same regularization scheme. CLEAN assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image, the Prior $P$ in Compressed Sensing CLEAN is the identity matrix. 
+Now $P$ that models the same regularization scheme. CLEAN assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image, the Prior $P$ in Compressed Sensing CLEAN is the identity matrix. 
 
 CLEAN uses a greedy optimization scheme. In every iteration, CLEAN searches the highest peak in the dirty image. Matching Pursuit is a greedy optimization scheme for $L0$ objectives like our Compressed Sensing CLEAN \eqref{intro:eq:csclean}.
 

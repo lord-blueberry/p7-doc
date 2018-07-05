@@ -20,23 +20,26 @@ From compression algorithm, we assume there is a Prior $P$ in which our signal c
 	\end{split}
 \end{equation}
 
-In image compression this phenomenon was already observed: image depicting nature scenes tend to be sparse in the wavelet domain. . If $x$ in \eqref{cs:eq:sparseDic} are nature scenes, we can create a Dictionary $Dic$ of wavelets. A single image $x$ can be represented with a few wavelets, meaning the number of non-zero entries $s$ in $\alpha$ is far lower than the number of pixels $n$. All that is left to do for compression is save the non-zero entries of $\alpha$.
+In image compression this phenomenon was already observed: image depicting nature scenes tend to be sparse in the wavelet domain. If $x$ in \eqref{cs:eq:sparseDic} are nature scenes, we can create a Dictionary $Dic$ of wavelets. A single image $x$ can be represented with a few wavelets, meaning the number of non-zero entries $s$ in $\alpha$ is far lower than the number of pixels $n$. All that is left to do for compression is save the non-zero entries of $\alpha$.  An important side-note is the effect of noise: Independent noise tends to affect all elements of the Dictionary: Saving the $s$ largest values of a noisy sparse vector $\alpha$ is the same as de-noising $x$. The problems of compression, de-noising and indeed sampling are related.
 
-Noise tends to affect all entries of the Dictionary. Sparseland Prior has had success in image de-noising.
+Back to the ill-posed inverse problem of interferometry: We measure the complex Visibilities of a band-limited signal. The Nyquist-Shannon rate states that if our band limited signal has at most frequency $f$, our sample frequency needs to be higher than $2f$. For $n$ pixels, this is the case when we measure all $n$ complex Visibilites (two samples per Visibility). If we have fewer samples, the Nyquist Shannon theorem says we cannot reconstruct the true image.
 
-The signal parts is not restricted to be in one domain. It can consists of wavelets, cosine functions, a combination of both, or any other function. 
+But what if we know our image is a Sparseland Signal and we happen to know the dictionary? Let us assume our image consists of $n = 20*20$ pixels and our dictionary of $m = 1000$ wavelets. Further assume at most $s=10$ of the wavelets are non-zero for a given image. Could one just measure the 10 non-zero components of $\alpha$ and reconstruct the image? 
 
-Work with over-complete dictionaries, where the number of pixels $n$ is far smaller than the number of signal parts $m$. There are redundant entries which is OK, as long is it is not too redundant. There is a tradeoff in practice in how sparse a signal can be represented and how redundant the dictionary is.
+If we have prior knowledge about the location of the non-zero components, we would need 10 samples to reconstruct the image. Sadly, this is not the case in general. With the first sample we have a $1/100$ chance of measuring a non-zero component. However note that if we measure a non-zero component, we learn $1/10$ of the information about the image. If we hit a zero component, we learn practically nothing. Is there a way we can maximize our information gain of the non-zero components for each sample? In fact, there is: By having the measurement space be  as incoherent as possible from the dictionary space, we maximize the information gained per sample.
 
-Back to the ill-posed inverse problem of interferometry. Nyquist Shannon Sampling Theorem requires that if we want an image of $n$ pixels, we need at least $2n$ measurements. The small Field of View Interferometer measures complex visibilities, so for $n$ fully sampled pixels we need $n$ complex Visibility measurements.
+[How many samples are needed]
 
-But when we know it is a Sparseland signal and we know the Dictionary, we could try to measure in the Dictionary space, so we could try to retrieve the non-zero components and only measure $s$ samples. Sadly, this is only possible if we know which entry of the dictionary are non-zero beforehand, which is in general not possible. So we would measure different $\alpha$ and are more likely to hit a zero component. Note however that if we measure a non-zero component of $\alpha$, we learn a lot more about our signal than when we hit a zero component. So the next question is, can we measure in a space where we learn more about the non-zero components of $\alpha$?
+Constructing an incoherent sampling space is surprisingly easy. Random projections are likely to produce a incoherent sampling space. Since we use an interferometer, we are bound to measure in Fourier Space. Depending on the Prior, the Fourier Space might be coherent with the dictionary space and we do gain the maximum amount of information. To help with incoherence, the 
 
-Surprisingly, the answer is yes, there is a way. The space in which we measure our signal $x$ should be incoherent from our Dictionary. With that we maximize the amount we learn about the non-zero components of $alpha$ with each measurement. Interestingly enough, constructing an incoherent measurement space is easy: Random projections are very good at being incoherent from the dictionary. 
-
+Since we use an interferometer, we measure in the Fourier Space.
 Random Projections are not possible, the Interferometer measures complex visibilities. Antenna configuration could help. But luckily what also can help is the Wide Field imaging. McEwen \cite{mcewen2011compressed} showed the theoretical improvement on synthetic data.
 
-How many samples are now needed? 
+starlet\cite{starck2015starlet}
+
+%The signal parts is not restricted to be in one domain. It can consists of wavelets, cosine functions, a combination of both, or any other function. 
+
+
 
 CS does not need an over-complete dictionary. It can also work for wavelet domains. overcomplete dictionaries give more freedom in representation.
 
