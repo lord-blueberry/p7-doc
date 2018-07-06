@@ -1,7 +1,7 @@
 \section{Compressed Sensing for Radio Astronomy} \label{cs}
-The push to wide Field of View imaging has led to increased research into Compressed Sensing. The effects can be modelled in numerous ways in the objective term of Compressed Sensing.The new class of Interferometers also produce a new class of problem size. The ideal Compressed Sensing approach accounts for the effects of Wide Field imaging, uses the most accurate prior to produce the best reconstruction while being scalable to a new magnitude of problem size.
+The push to wide Field of View imaging has led to increased research into Compressed Sensing. The flexibility allows for a lot of freedom in design which can lead to different approaches for the same problem. So far, there are no 'best practices' for Astronomy: No prior, objective or optimization algorithm works strictly better than every other choice. Furthermore the choices for the individual parts influence each other. Compressed Sensing is flexible, but not every optimization algorithm works with every prior.
 
-In reality, this is not possible, it is still an open question how to use the resources most efficiently. In this project, the focus was set on using different priors and incorporating it in CASA. GuRoBi was used as the optimization algorithm.
+%In this project, the GuRoBi optimization algorithm was used. It uses the Simplex to solve the quadratic programming problems. It  out to be not ideal for the Inverse Problems of Radio Astronomy. However
 
 
 \subsection{The Sparseland Prior and Incoherence: How Compressed Sensing works}
@@ -26,8 +26,9 @@ But what if we know our image is a Sparseland Signal and we happen to know the d
 
 Constructing an incoherent sampling space is surprisingly easy. Random projections are likely to produce a incoherent sampling space. Since we use an interferometer, we are bound to measure in Fourier Space. Depending on the prior, the Fourier Space might be coherent with the dictionary space and we do gain the maximum amount of information. As discussed in section \ref{radio}, wide Field of View imaging breaks the two dimensional Fourier relationship. McEwen et al\cite{mcewen2011compressed} showed that the wide Field of View measurement equation can help with incoherence, and demonstrated higher image reconstruction quality on simulated data.
 
+The Sparseland prior is the basis of which Compressed Sensing builds. The dictionary can contain any function and is not limited to wavelets. It can even contain a mixture of for example wavelets, gaussians and cosine functions. Sparseland priors lend themselves to over-complete representations, where the number of dictionary entries is multiple times higher than the number of pixels($m \gg n$). 
 
-Sparseland prior. The dictionary can consist of wavelets, Cosine Functions or a mixture of all. A Dictionary lends itself to overcomplete representations: where the number of Dictionary entries $m$ is larger than pixels in the image $n$. A good prior for Radio Astronomy is still in research, current ideas are mixture of gaussians, Starlets\cite{starck2015starlet} and Curvelets\cite{something}. 
+An appropriate prior for Radio Astronomy is still under research, currently Starlets\cite{starck2015starlet} and Curvelets\cite{something} are on top of the foodchain
 
 
 \subsection{Objective Function}
@@ -49,13 +50,11 @@ All three objective functions have the same global minimum. Retrieving $x$ for t
 	\underset{x}{minimize} \: \left \| V - MF_{wFOV} x \right \|_2^2 + \lambda \left \| Px\right \|_1
 \end{equation}
 
-How to setup $F_{wFOV}$. It is in the easiest case. Often, V is sampled on a regular Grid an A can the A-projection matrix
-A-projection lofar \cite{tasse2013applying}
+%How to setup $F_{FOV}$. It is in the easiest case. Often, V is sampled on a regular Grid an A can the A-projection matrix
+%A-projection lofar \cite{tasse2013applying}
 
 
-A lot of freedom to choose. 
-
-For this project CASA was used, which limits the choices.
+%A lot of freedom to choose. For this project CASA was used, which limits the choices.
 
 
 \subsubsection{Implementation In Casa}
@@ -80,6 +79,11 @@ Major minor cycle
 \subsection{Compressed Sensing Algorithms in Astronomy}
 
 \subsubsection{SASIR}
+Prior
+
+Objective
+
+Optimizer
 
 \subsubsection{PURIFY}
 

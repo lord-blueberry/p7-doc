@@ -3,7 +3,7 @@ Astronomy requires its instruments to have a high angular resolutions. This is a
 
 Interferometers do not observe the sky directly. Each antenna pair measure Fourier Components (Visibilities) of the sky brightness. The observed image has to be reconstructed from the measured Visibilites. Since the interferometer can only observe a limited number of Visibilities, the reconstruction is an ill-posed inverse problem. For small Field of View imaging, the CLEAN class of Algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} have been developed and is the de-facto standard in Radio Astronomy. It is not guaranteed to reconstruct the true image in theory. In practice it has produced remarkable results with expert tuning. New generation Interferometers like ASKAP, Pathfinder and SKA are built with wide Field of View imaging in mind. The CLEAN Algorithms have been extended for Wide Field of Views, but require even more tuning by experts. 
 
-The Theory of Compressed Sensing\cite{many} has seen success in solving ill-posed inverse problems. It is flexible in its application and has produced remarkable results image de-noising\cite{many}, in-painting\cite{many} and super-resolution\cite{many}. Applying Compressed Sensing to wide Field of View imaging is an active field of research. In the last decade numerous approaches have been developed showing the potential of Compressed Sensing: Accurately modelling the effects of wide Field of View imaging, while reducing the tunable parameters and possibly super-resolved images\cite{many}. Current research focuses on how the effects of wide Field of View can be accurately modelled while still being computationally efficient.
+The Theory of Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} has seen success in solving ill-posed inverse problems. It is flexible in its application and has produced remarkable results image de-noising\cite{many}, in-painting\cite{many} and super-resolution\cite{many}. Applying Compressed Sensing to wide Field of View imaging is an active field of research. In the last decade numerous approaches have been developed showing the potential of Compressed Sensing: Accurately modelling the effects of wide Field of View imaging, while reducing the tunable parameters and possibly super-resolved images\cite{garsden2015lofar}. Current research focuses on how the effects of wide Field of View can be accurately modelled while still being computationally efficient.
 
 In this project, a proof of concept Compressed Sensing approach was developed and implemented in the Common Astronomy Software Application(CASA). The approach is focused on small Field of View imaging and the reduction of expert intervention.
 
@@ -81,14 +81,8 @@ To demonstrate the flexibility of the Compressed Sensing Framework, we convert C
 
 The Prior $P$ transforms the image in a sparse domain. CLEAN assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image, the Prior $P$ in Compressed Sensing CLEAN is the identity matrix.  
 
-The last step is choosing a similar optimization algorithm: In every iteration, CLEAN searches the highest peak in the dirty image. Matching Pursuit is a greedy optimization algorithm. In every iteration it searches the step which minimizes \eqref{intro:eq:csclean} the most.
+The last step is choosing a similar optimization algorithm: In every iteration, CLEAN searches the highest peak in the dirty image. Matching Pursuit is a greedy optimization algorithm. In every iteration it searches the step which minimizes \eqref{intro:eq:csclean} the most. This Compressed Sensing approach is similar to CLEAN, but the new objective has a unique global minimum even with the presence of noise. The tunable parameters of CLEAN are replaced by a single parameter $\lambda$, which can be estimated.
 
-
-Same as clean, but now we have a global optimization scheme. The CLEAN parameters are not needed any more, $\lambda$ can be estimated. Different parts can be replaced: $P$ can be replaced with Total Variation Prior, Wavelet Transform or Starlets without changing the objective function or the optimization algorithm. 
-
-A lot of freedom to design, which is why it is interesting for wide Field of View imaging. active field of research. Interest because it can solve the three problems in Radio Astronomy:
-Model the effects of wide Field of View imaging.
-Model the true image and improve the reconstruction for extended sources.
-Scalable optimization algorithm to handle the data of new large interferometers.
+The strength of Compressed Sensing Framework is its flexibility: The CLEAN prior works well on point sources, but is not ideal for extended emissions. In this Framework, the prior $P$ can be replaced without changing the objective or the optimization algorithm. This has led to increased interest in Compressed Sensing for wide Field of View imaging.
 
 
