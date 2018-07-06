@@ -68,45 +68,27 @@ The CLEAN regularization scheme is not ideal for extended sources. Ideally anoth
 \subsection{From CLEAN to Compressed Sensing}
 In the Compressed Sensing Framework, an approach is split into three separate parts:
 \begin{itemize}
-	\item An objective with a data and regularization term
-	\item A prior $P$ in which the signal can be sparsely represented.
+	\item An objective with a data and regularization term.
+	\item A prior $P$ in which transforms the image into a sparse domain.
 	\item An optimization algorithm that is suited for the objective.
 \end{itemize}
 
-
-The fra
-To demonstrate the flexibility of the Compressed Sensing Framework, we convert CLEAN into a Compressed Sensing approach. First we add a regularization term to \eqref{intro:eq:clean} and arrive at the new objective \eqref{intro:eq:csclean}. The objective contains the old CLEAN data term and a new regularization term. The data term forces the reconstruction to be close to the measurement, while the regularization term forces the reconstruction to be plausible. $\lambda$ models the expected noise in the problem. Note that the zero norm $\left \| Px \right \|_0$ acts as an indicator function. 
+To demonstrate the flexibility of the Compressed Sensing Framework, we convert CLEAN into a Compressed Sensing approach. First we add a regularization term to \eqref{intro:eq:clean} and arrive at the new objective \eqref{intro:eq:csclean}. The objective contains the original CLEAN data term and a new regularization term. The data term forces the reconstruction to be close to the measurement, while the regularization term forces the reconstruction to be plausible. $\lambda$ models the expected noise in the problem. Note that the $\left \| Px \right \|_0$ acts as an indicator function. 
 
 \begin{equation}\label{intro:eq:csclean}
 	\underset{x}{minimize} \: \left \| D_{dirty} - x \star PSF \right \|_2^2 \: + \: \lambda \left \| Px \right \|_0
 \end{equation}
 
-Now $P$ that models the same regularization scheme. CLEAN assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image, the Prior $P$ in Compressed Sensing CLEAN is the identity matrix. 
+The Prior $P$ transforms the image in a sparse domain. CLEAN assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image, the Prior $P$ in Compressed Sensing CLEAN is the identity matrix.  
 
-CLEAN uses a greedy optimization scheme. In every iteration, CLEAN searches the highest peak in the dirty image. Matching Pursuit is a greedy optimization scheme for $L0$ objectives like our Compressed Sensing CLEAN \eqref{intro:eq:csclean}.
-
-
+The last step is choosing a similar optimization algorithm: In every iteration, CLEAN searches the highest peak in the dirty image. Matching Pursuit is a greedy optimization algorithm. In every iteration it searches the step which minimizes \eqref{intro:eq:csclean} the most.
 
 
+Same as clean, but now we have a global optimization scheme. The CLEAN parameters are not needed any more, $\lambda$ can be estimated. Different parts can be replaced: $P$ can be replaced with Total Variation Prior, Wavelet Transform or Starlets without changing the objective function or the optimization algorithm. 
 
-Both versions of CLEAN produce the same result, but we are getting rid of the tunable parameters in favour of a single $\lambda$. There exist schemes that estimate the correct $\lambda$ for a given problem.
-
-In the noisy environment the true image may not be located at a minimum of the CLEAN objective \eqref{intro:eq:clean}. The Compressed Sensing objective is guaranteed to have a unique global minimum and the true image is guaranteed to be there if:
-\begin{itemize}
-	\item The Prior models our signal well enough
-	\item Enough samples are available. 
-\end{itemize}
-
-How many samples are needed? Interestingly enough, we do not need the Nyquist-Shannon rate. It depends on the prior. 
-
-Same as clean, but now we have a global optimization scheme, the regularization is explicit and replaceable.
-
-The important questions are: In an undersampled, noisy environment, does the new objective \eqref{intro:eq:csclean} have a global minimum? What is the chances that the minimum is equal to the true image? It turns out that even though we have fewer samples than the Nyquist-Shannon Theorem requires, we can guarantee a global minimum and that the minimum is equal to the true image, if we have enough prior knowledge $P$ about the signal. How we model the signal and by extend, what $P$ we choose is essential for Compressed Sensing
-
-
-The data term is for small Field of View imaging, it can be modified to solve the wide Field of View problem.
-
-
-
+A lot of freedom to design, which is why it is interesting for wide Field of View imaging. active field of research. Interest because it can solve the three problems in Radio Astronomy:
+Model the effects of wide Field of View imaging.
+Model the true image and improve the reconstruction for extended sources.
+Scalable optimization algorithm to handle the data of new large interferometers.
 
 

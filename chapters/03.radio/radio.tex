@@ -21,10 +21,8 @@ For wide Field of View imaging, two effects break the two dimensional Fourier Tr
 
 Non-coplanar Baselines lead to a third component $w$ for each Visibility. Figure \ref{radio:uvw} shows the the $u$ $v$ and $w$ coordinate system. $w$ is essentially the pointing direction of the instrument. The UV-Plane is the projection of the antennas on a plane perpendicular to the pointing direction. Which point in the UV-Plane get sampled and what $w$ component it has depends on the pointing direction. If the instrument points straight up, the UV-Plane is a tangent to earth's surface, and the $w$ term compensates for earth's surface curvature. If however the instrument points at the horizon, the projected UV-Plane gets squashed and $w$ compensates for antennas which lie far behind the UV-Plane. In essence, $w$ is a phase delay that corrects antenna positions in three dimensions. The wide Field of View measurement equation \eqref{radio:eq:ftSphere} would account for the $w$ phase delay, but it breaks the the two dimensional Fourier relationship and the FFT cannot be used. The W-Projection \cite{cornwell2008noncoplanar} algorithm approximates the effect of the $w$ term restores the two dimensional Fourier relationship.
 
-A-Projection \cite{tasse2013applying}
+A-Projection \cite{bhatnagar2008correcting}
 
-
-new instruments like SKA, ASKAP and Pathfinder are constructed with a wide Field of View in mind. The simple two dimensional Fourier Transform does not hold true anymore and we arrive at the wide Field of View measurement equation \eqref{radio:eq:ftSphere}.
 
 spread spectrum phenomenon
 
@@ -36,13 +34,10 @@ All here to try to get back to the 2d fourier transform.
 
 %source \cite{lfraSchool}
 
-
-Strength of compressed sensing is modelling these effects.
-
 \subsection{Calibration}
-A lot of effects, weather, noise, antenna temperature, drift.
+%A lot of effects, weather, noise, antenna temperature, drift.
 
-Antenna based calibration, holds true for current interferometers but is not true for SKA. Possible switch to baseline based calibration.
+%Antenna based calibration, holds true for current interferometers but is not true for SKA. Possible switch to baseline based calibration.
+
 
 \subsubsection{Self-Calibration}
-?
