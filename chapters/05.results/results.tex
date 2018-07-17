@@ -1,14 +1,64 @@
 \section{Results}
 
-Physical plausible and shown to produce better results on synthetic data \cite{mcewen2011compressed}
+CASA Release 5.3.0
 
 
 
-Clean images:
+Problem with runtime
+
+Problem with memory, $x \star PSF$ gets modeled as a vector matrix multiplication $Px$. The image $x$ and $PSF$ with dimensions of $128 * 128$, result in a matrix of size $128^2 * 128^2$. The memory requirement scales quadratic with the number of pixels. 
 
 
-Gurobi Clean
 
+
+Miller estimation of Lambda \cite{miller1970least}
+
+All algorithms constrain the model image to be non-negative. Physical plausible and shown to produce better results on synthetic data \cite{mcewen2011compressed}
+
+Last parameter was the 
+
+Deconvolution, no regularization.
+
+Simple Priors:
+\begin{itemize}
+	\item L1 Norm
+	\item L2 Norm
+	\item Total Variation
+\end{itemize}
+
+Complex Priors:
+\begin{itemize}
+	\item 2d Haar Transform
+	\item Starlet Transformation
+\end{itemize}
+
+
+\subsection{Supernova Remnant G55}
+\begin{wrapfigure}{r}{0.5\textwidth}
+	\centering
+	\vspace{-15pt}
+	\includegraphics[width=\linewidth, trim={230px 230px 200px 200px}, clip]{./chapters/05.results/g55/pic_G55_7.png}
+	\caption{SNR G55 reconstructed source observed by VLA. Source:\cite{nraoG55}}
+	\label{results:g55:nrao}
+	\vspace{-15pt}
+\end{wrapfigure}
+
+Supernova remnant (SNR). Circle in the middle with several bright sources. The primary beam is approximately the size of the remnant, the whole image is $\approx$2 times the primary beam width.
+
+Data from CASA imaging tutorial\cite{casaImagingGuide}. It is unknown if the data used to create \ref{results:g55:nrao} is the same as the data available for the imaging tutorial. Also the reconstruction algorithm used is unknown. Nevertheless,
+
+Wide FoV constructs were not used, limits the dynamic range. The fainter point sources may get masked by noise.
+
+Primary Beam is approximately the size of the remnant. The image shown here is the cutout used to compare algorithms. the full image is about twice the size of what was used in this project. [$128*128$ were used due to memory limitations.]
+
+CLEAN algorithm, parameters were used from the imaging tutorial \cite{casaImagingGuide}
+\begin{figure}
+	\caption{Simple priors compared with tclean}
+\end{figure}
+
+\begin{figure}
+\end{figure}
+plot with all stuff done
 
 \subsection{Simple Priors}
 
