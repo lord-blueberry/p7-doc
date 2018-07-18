@@ -50,7 +50,7 @@ There are three different Compressed Sensing objectives: The analysis method, wh
 
 All three objective functions have the same global minimum. Retrieving $x$ for the analysis objective is trivial, or the second and third objective $x$ can be retrieved by $x = D\alpha$ and by $x = F^{-1}V_2$ respectively. [Empirical and theoretical studies have shown an advantage of the analysis objective over the other two \cite{something}]. However, depending on the measurement space, prior and optimization algorithm, one objective may be easier to solve than others. The analysis objective is not useful when there is no transformation from $x$ into the sparse space. This is the case for most over-complete priors: In that case, $P$ is a $m*n$ matrix and  $Px \ne \alpha$. The synthesis method just requires a transformation from the sparse space to image $D\alpha = x$. Similarly one might chose the in-painting method when the prior is a convolution in image space: Convolutions in image space are equivalent to a multiplication in Fourier Space.
 
-
+wide field imaging considerations
 \begin{equation}\label{cs:eq:wfield}
 	\underset{x}{minimize} \: \left \| V - MF_{WFOV} x \right \|_2^2 + \lambda \left \| Px\right \|_1
 \end{equation}

@@ -46,8 +46,9 @@ png(paste(outFolder,"dirty_image.png",sep=""),
     height = 6.0,
     units = "in",
     res = 1000)
-WriteMap(dirty,plotLen=1000)
+WriteMap(dirty,plotLen=200)
 dev.off()
 
-dirty[90,21] =40
+dirty[89,21]
+dirty[34,64]
 

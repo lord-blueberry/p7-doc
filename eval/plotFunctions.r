@@ -22,6 +22,24 @@ WriteMap <- function(x,plotLen=100) {
 }
 
 
+WriteMap2 <- function(x, at) {
+  par(mar=c(0,0,0,0),plt=c(0,0,0,0),oma=c(0,0,0,0))
+  levelplot(x,
+            at = at,
+            margin=FALSE,
+            par.settings=list(
+              axis.line=list(col='transparent') # suppress axes and legend outline
+            ),
+            scales=list(draw=FALSE),
+            col.regions=viridis,
+            colorkey = FALSE,
+            xlab="",
+            ylab=""
+            
+  )
+}
+
+
 conv_slow <- function(x, kernel) {
   k <- apply(kernel, 2, rev)
   k <- apply(k, 1, rev)
