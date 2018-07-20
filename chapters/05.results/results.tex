@@ -1,8 +1,7 @@
-\section{Results}
+\section{Reconstruction Priors on VLA Data}
 
 CASA Release 5.3.0 was useds
 
-Problem with runtime
 
 Problem with memory, $x \star PSF$ gets modeled as a vector matrix multiplication $Px$. The image $x$ and $PSF$ with dimensions of $128 * 128$, result in a matrix of size $128^2 * 128^2$. The memory requirement scales quadratic with the number of pixels. 
 
@@ -16,11 +15,8 @@ Simple Priors:
 	\item Total Variation
 \end{itemize}
 
-Complex Priors:
-\begin{itemize}
-	\item 2d Haar Transform
-	\item Starlet Transformation
-\end{itemize}
+Starlet transform
+
 
 Parameters of new algorithms
 Miller estimation of Lambda \cite{miller1970least}

@@ -1,6 +1,7 @@
 library(rgdal)
 library(rasterVis)
 library(viridis)
+library(RColorBrewer)
 
 
 WriteMap <- function(x,plotLen=100) {
@@ -31,7 +32,7 @@ WriteMap2 <- function(x, at) {
               axis.line=list(col='transparent') # suppress axes and legend outline
             ),
             scales=list(draw=FALSE),
-            col.regions=viridis,
+            col.regions=colorRampPalette(brewer.pal(n =11, name="RdYlGn")),
             colorkey = FALSE,
             xlab="",
             ylab=""

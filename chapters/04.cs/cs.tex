@@ -1,7 +1,6 @@
-\section{Compressed Sensing for Radio Astronomy} \label{cs}
+\section{Image Reconstruction with Compressed Sensing} \label{cs}
 The push to wide Field of View imaging has led to increased research into Compressed Sensing. 
 
-%But has also can do good for small FoV imaging. Possibility to reduce tunable parameter of algorithm, []converge to a stable solution], 
 
 
 The flexibility allows for a lot of freedom in design which can lead to different approaches for the same problem. So far, there are no 'best practices' for Astronomy: No prior, objective or optimization algorithm works strictly better than every other choice. Furthermore the choices for the individual parts influence each other. Compressed Sensing is flexible, but not every optimization algorithm works with every prior.
@@ -99,8 +98,9 @@ Optimizer: Coordinate descent
 	\includegraphics[width=0.9\linewidth]{./chapters/04.cs/img/casa_major_minor.png}
 	\caption{Casa Major Minor Cycle, source \cite{casa2018major}}
 	\label{cs:major}
-	\vspace{-15pt}
+	\vspace{-10pt}
 \end{wrapfigure}
+
 Terminology in CASA.
 
 CASA is a software package built for solving the deconvolution problem for instruments like VLA and ALMA. "Data" Column measurements(calibrated), model column contains the "true" visibilities and the residual column only noise. The architecture is oriented after the CLEAN algorithm, it is split in a major and minor cycle.\ref{cs:major}. The first part of the major cycle produces the dirty image and the PSF. The minor cycle is where a deconvolution algorithm "cleans" the dirty image, several iterations of CLEAN. Major cycle ends with the forward fourier transform. Chi$^2$ approximation of the visibilities. At the end of several major cycle, the Model column should contain an approximation of the true visibilities while the Residuals should be pure noise.
