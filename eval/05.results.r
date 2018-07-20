@@ -1,36 +1,44 @@
 source("plotFunctions.r")
 library(graphics)
 
-inFolder = "../../p7-cs/results/supernova/csv/"
-outFolder = "../chapters/05.results/g55/"
-
 start.name=nchar("SNR_G55_10s.128.")
 
+read <- function(images) {
+  resoultion <- 26
+  pixels <- 128
+  axis <- 0:(pixels-1) * resoultion
+  images.list <- list()
+  for(img in images) {
+    data <- read.table(paste(inFolder, img, sep=""), header = FALSE, sep = ",")
+    data = data.matrix(data)
+    colnames(data) = axis
+    rownames(data) = axis
+    outName <- gsub("\\.", "_", substring(basename(img), start.name+1, nchar(basename(img))-4))
+    images.list[[outName]] <- data
+  }
+  return(images.list)
+}
+
 #write png images on same intensity profile except raw images
-writePNGs <- function(file.names, plotLen) {
+writePNGs <- function(images.list, names, plotLen) {
   max = 0
   min = 0
-  for(i in 1:length(file.names)) {
-    if(!grepl("raw", file.names[i])) {
-      data <- read.table(paste(inFolder, file.names[i], sep=""), header = FALSE, sep = ",")
-      d = data.matrix(data)
+  for(name in names) {
+    if(!grepl("raw", name)) {
+      d <- data.matrix(images.list[[name]])
       max = max(max, d)
       min = min(min, d)
     }
   }
   
-  for(i in 1:length(file.names)) {
-    data <- read.table(paste(inFolder, file.names[i], sep=""), header = FALSE, sep = ",")
-    d = data.matrix(data)
-    colnames(d) = 0:(nrow(d)-1)
-    rownames(d) = 0:(nrow(d)-1)
-    outName <- gsub("\\.", "_", substring(basename(file.names[i]), start.name+1, nchar(basename(file.names[i]))-4))
-    png(paste(outFolder,outName, ".png",sep=""),
+  for(name in names) {
+    d <- data.matrix(images.list[[name]])
+    png(paste(outFolder,name, ".png",sep=""),
         width = 6.0,
         height = 6.0,
         units = "in",
         res = 200)
-    if(!grepl("raw", file.names[i])) {
+    if(!grepl("raw", name)) {
       print(WriteMap2(d,at=seq(min,max,length.out=plotLen)))
     } else {
       print(WriteMap2(d,at=seq(min(d),max(d),length.out=plotLen)))
@@ -39,44 +47,7 @@ writePNGs <- function(file.names, plotLen) {
   }
 }
 
-#write pngs at a logarithmic intensity scale
-write_stupdid <- function(file.names) {
-  for(i in 1:length(file.names)) {
-    data <- read.table(paste(inFolder, file.names[i], sep=""), header = FALSE, sep = ",")
-    d = data.matrix(data)
-    colnames(d) = 0:(nrow(d)-1)
-    rownames(d) = 0:(nrow(d)-1)
-    outName <- gsub("\\.", "_", substring(basename(file.names[i]), start.name+1, nchar(basename(file.names[i]))-4))
-    png(paste(outFolder,outName, ".png",sep=""),
-        width = 6.0,
-        height = 6.0,
-        units = "in",
-        res = 200)
-    min <- log(min(d) +1)
-    max <- log(max(d) +1)
-    at <- (exp(seq(0, log(2), length.out=400)) -1) 
-    at <- at / max(at)
-    at <- at * (max(d) - min(d)) + min(d)
-    if(at[1] != min(d))
-      at <- c(min(d), at)
-    print(WriteMap2(d, at=at))
-    dev.off()
-  }
-}
-
-calc_rms <- function(file.names) {
-  for(i in 1:length(file.names)) {
-    data <- read.table(paste(inFolder, file.names[i], sep=""), header = FALSE, sep = ",")
-    d = data.matrix(data)
-    outName <- gsub("\\.", "_", substring(basename(file.names[i]), start.name+1, nchar(basename(file.names[i]))-4))
-    
-    res <- d - mean(d)
-    rms <- sqrt(sum(res*res))
-    print(paste(outName, rms))
-  }
-}
-
-calc_line <- function(matrix, p0, p1, length.out=100) {
+calcline <- function(matrix, p0, p1, length.out=100) {
   a <- p1 - p0
   x0 <- p0 + a*((-p0[2]+1)/ a[2])
   y0 <- p0 + a*((-p0[1]+1)/ a[1])
@@ -101,8 +72,7 @@ calc_line <- function(matrix, p0, p1, length.out=100) {
   return(line)
 }
 
-
-plot_line <- function(files) {
+plotline <- function(files) {
   p0 <- c(92,29)
   p1 <- c(29,85)
   interpolation.length <- 500
@@ -154,18 +124,31 @@ plot_line <- function(files) {
 }
 
 
-
+inFolder = "../../p7-cs/results/supernova/csv/"
+outFolder = "../chapters/05.results/g55/"
 f <- dir(inFolder)
 images <- f[endsWith(f, "image.csv")]
 residuals <- f[endsWith(f, "residual.csv")]
 models <- f[endsWith(f, "model.csv")]
 
-writePNGs(images,300)
-writePNGs(residuals,300)
-writePNGs(models,200)
+img.list <- read(images)
+img.names <- gsub("\\.", "_", substring(basename(images), start.name+1, nchar(basename(images))-4))
+res.list <- read(residuals)
+res.names <- gsub("\\.", "_", substring(basename(residuals), start.name+1, nchar(basename(residuals))-4))
+mod.list <- read(models)
+mod.names <- gsub("\\.", "_", substring(basename(models), start.name+1, nchar(basename(models))-4))
 
+#modify clean
+clean.img <-  data.matrix(img.list[["clean_image"]])
+clean.res <-  data.matrix(res.list[["clean_residual"]])
+diff <- clean.img - clean.res
+mod.list[["clean_model"]] <- diff
+mod.list[["raw_model"]] <- data.matrix(img.list[["raw_image"]])
 
-calc_rms(residuals)
+#writePNGs(img.list, img.names, 300)
+writePNGs(res.list,res.names, 300)
+writePNGs(mod.list,mod.names, 200)
+
 
 library(ggplot2)
 p0 <- c(92,29)
@@ -174,17 +157,14 @@ interpolation.length <- 500
 df <- data.frame(matrix(ncol=3, nrow=ncol(cut)*interpolation.length))
 colnames(df) <- c("index", "value","image")
 i <- 0
-for(image in images) {
-  data <- read.table(paste(inFolder, image, sep=""), header = FALSE, sep = ",")
-  d = data.matrix(data)
-  colnames(d) = 0:(nrow(d)-1)
-  rownames(d) = 0:(nrow(d)-1)
+for(name in mod.names) {
+  d = data.matrix(mod.list[[name]])
   line <- calc_line(d, p0, p1, interpolation.length)
   start <- i + 1
   stop <- i +interpolation.length
   df$index[start:stop] = 1:interpolation.length
   df$value[start:stop] = line
-  df$image[start:stop] = image
+  df$image[start:stop] = name
   i = i + interpolation.length
 }
 
