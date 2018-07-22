@@ -19,6 +19,14 @@ read <- function(images) {
   return(images.list)
 }
 
+logtrans <- function(x) {
+  s <- sign(x)
+  zero <- x[x == 0]
+  x.abs <- abs(x)
+  x2 <- s*abs(log10(x.abs))
+  x2[zero] = 0
+}
+
 #write png images on same intensity profile except raw images
 writePNGs <- function(images.list, names, plotLen) {
   max = 0
@@ -50,7 +58,13 @@ writePNGs <- function(images.list, names, plotLen) {
 calcline <- function(matrix, p0, p1, length.out=100) {
   a <- p1 - p0
   x0 <- p0 + a*((-p0[2]+1)/ a[2])
+  if(x0[1] > nrow(matrix)) {
+    x0 <- p0 + a*((nrow(matrix)-p0[1])/ a[1])
+  }
   y0 <- p0 + a*((-p0[1]+1)/ a[1])
+  if(y0[2] > ncol(matrix)) {
+    y0 <- p0 + a*((ncol(matrix)-p0[2])/ a[2])
+  }
   
   a <- y0 - x0
   line <-rep(c(0),length.out=length.out)
@@ -72,51 +86,44 @@ calcline <- function(matrix, p0, p1, length.out=100) {
   return(line)
 }
 
-plotline <- function(files) {
+plotline <- function(mod.list, files1, files2) {
   p0 <- c(92,29)
-  p1 <- c(29,85)
+  #p1 <- c(29,85)
+  p1 <- c(46,59)
   interpolation.length <- 500
-  
-  files1 <- c("raw", "clean", "positive_deconv" ,"L1", "L2")
-  files2 <- c("raw", "clean", "TV", "starlets1", "starlets3")
   
   df1 <- data.frame(matrix(ncol=3, nrow=length(files1)*interpolation.length))
   colnames(df1) <- c("index", "value","image")
-  df2 <- data.frame(matrix(ncol=3, nrow=length(files2)*interpolation.length))
-  colnames(df2) <- c("index", "value","image")
   i1 <- 0
-  i2 <- 0
-  for(file in files) {
-    data <- read.table(paste(inFolder, file, sep=""), header = FALSE, sep = ",")
-    d = data.matrix(data)
-    colnames(d) = 0:(nrow(d)-1)
-    rownames(d) = 0:(nrow(d)-1)
-    line <- calc_line(d, p0, p1, interpolation.length)
-    for(f in files1) {
-      if(grepl(f, file)) {
-        print(file)
-        start <- i1 + 1
-        stop <- i1 +interpolation.length
-        df1$index[start:stop] = 1:interpolation.length
-        df1$value[start:stop] = line
-        df1$image[start:stop] = file
-        i1 = i1 + interpolation.length
-        break
-      }
-    }
-    for(f in files2) {
-      if(grepl(f, file)) {
-        start <- i2 + 1
-        stop <- i2 +interpolation.length
-        df2$index[start:stop] = 1:interpolation.length
-        df2$value[start:stop] = line
-        df2$image[start:stop] = file
-        i2 = i2 + interpolation.length
-      }
-    }
+  for (file in files1) {
+    d = data.matrix(mod.list[[file]])
+    line <- calcline(d, p0, p1, interpolation.length)
+    start <- i1 + 1
+    stop <- i1 + interpolation.length
+    df1$index[start:stop] = 1:interpolation.length
+    df1$value[start:stop] = line
+    df1$image[start:stop] = file
+    i1 = i1 + interpolation.length
   }
   
-  p <- ggplot(data = df1, aes(x=df1$index, y=df1$value, colour=df1$image)) 
+  df2 <- data.frame(matrix(ncol=3, nrow=length(files2)*interpolation.length))
+  colnames(df2) <- c("index", "value","image")
+  i2 <- 0
+  for (file in files2) {
+    print(file)
+    d = data.matrix(mod.list[[file]])
+    line <- calcline(d, p0, p1, interpolation.length)
+    start <- i2 + 1
+    stop <- i2 +interpolation.length
+    df2$index[start:stop] = 1:interpolation.length
+    df2$value[start:stop] = line
+    df2$image[start:stop] = file
+    i2 = i2 + interpolation.length
+  }
+  bla <- df1$value
+  
+  df1$value <- bla
+  p <- ggplot(data = df1, aes(x=df1$index, y=df1$value, colour=df1$image))
   p + geom_line()
   
   p <- ggplot(data = df2, aes(x=df2$index, y=df2$value, colour=df2$image)) 
@@ -151,22 +158,11 @@ writePNGs(mod.list,mod.names, 200)
 
 
 library(ggplot2)
-p0 <- c(92,29)
-p1 <- c(29,85)
-interpolation.length <- 500
-df <- data.frame(matrix(ncol=3, nrow=ncol(cut)*interpolation.length))
-colnames(df) <- c("index", "value","image")
-i <- 0
-for(name in mod.names) {
-  d = data.matrix(mod.list[[name]])
-  line <- calc_line(d, p0, p1, interpolation.length)
-  start <- i + 1
-  stop <- i +interpolation.length
-  df$index[start:stop] = 1:interpolation.length
-  df$value[start:stop] = line
-  df$image[start:stop] = name
-  i = i + interpolation.length
-}
+library(scales)
 
-p <- ggplot(data = df, aes(x=df$index, y=df$value, colour=df$image)) 
-p + geom_line()
+
+
+files1 <- c("raw_model", "clean_model", "positive_deconv_model" ,"L1_model", "L2_model")
+files2 <- c("raw_model", "clean_model", "TV_model", "haar_model", "starlets3_model")
+plotline(mod.list,files1, files2)
+

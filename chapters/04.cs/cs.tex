@@ -1,13 +1,27 @@
-\section{Image Reconstruction with Compressed Sensing} \label{cs}
-The push to wide Field of View imaging has led to increased research into Compressed Sensing. 
+\section{Compressed Sensing Image Reconstruction} \label{cs}
 
+The Framework Flexibility:
+
+Gurobi\cite{gurobi2018optimizer} was used
+
+
+
+\subsection{Sparseland Prior and Overcomplete Representations}
+L0, L1, L2 Priors
+
+The Compressed Sensing CLEAN objective \eqref{intro:eq:csclean} uses the L0 norm for it's regularization term, which means the Objective Function is not convex. There are specialized solvers for the L0 compressed sensing. The L1 relaxation however is practically guaranteed to have the same minimum as the L0 norm and results in a convex objective function. Since Gurobi works better on the L1 relaxation it was chosen for this project.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Old part
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 The flexibility allows for a lot of freedom in design which can lead to different approaches for the same problem. So far, there are no 'best practices' for Astronomy: No prior, objective or optimization algorithm works strictly better than every other choice. Furthermore the choices for the individual parts influence each other. Compressed Sensing is flexible, but not every optimization algorithm works with every prior.
 
 %In this project, the GuRoBi optimization algorithm was used. It uses the Simplex to solve the quadratic programming problems. It  out to be not ideal for the Inverse Problems of Radio Astronomy. However
-
-%Idea behind compressed sensing
 
 \subsection{The Sparseland Prior and Incoherence: How Compressed Sensing works}
 For Compressed Sensing we need a Prior $P$ in which our signal can be sparsely represented. It is not guaranteed that such a space exists, but for natural signals there always seem to be. This has led to the idea of the Sparseland Prior \eqref{cs:eq:sparseDic} which is at the core of Compressed Sensing: We assume for our signal $x$ there exists a dictionary $D$. Each entry represents a signal part which can be present. $D$ is potentially a large, but has a finite number entries. We assume that any $x$ can only consist of a few signal parts of $D$. This means the coefficients for the signal parts in the dictionary $\alpha$ are all zero except for $s$ entries for all valid $x$. 
@@ -36,9 +50,7 @@ The Sparseland prior is the basis of which Compressed Sensing builds. The dictio
 An appropriate prior for Radio Astronomy is still under research, currently Starlets\cite{starck2015starlet} and Curvelets\cite{starck2003astronomical} are on top of the foodchain
 
 
-\subsection{Objective Function}
-The Compressed Sensing CLEAN objective function \eqref{intro:eq:csclean} uses the L0 norm for it's regularization term, which means the Objective Function is not convex. There are specialized solvers for the L0 compressed sensing. The L1 relaxation however is practically guaranteed to have the same minimum as the L0 norm and results in a convex objective function. Since GuRoBi works better on the L1 relaxation it was chosen for this project.
-
+\subsection{Choosing the Objective Function}
 There are three different Compressed Sensing objectives: The analysis method, where the image $x$ is minimized directly, the synthesis method where the sparse vector $\alpha$ is minimized, or by in-painting the missing Visibilities $V_2$.
 
 \begin{alignat*}{2}
@@ -60,20 +72,11 @@ A-projection lofar \cite{tasse2013applying}
 
 %A lot of freedom to choose. For this project CASA was used, which limits the choices.
 
-\subsection{Compressed Sensing Algorithms in Astronomy}
-
-
-
-\subsubsection{SASIR}
-Prior: Starlets
-
-Objective: in-painting
-
-Optimizer: FISTA
+\subsection{Compressed Sensing Reconstruction Algorithms in Astronomy}
 
 
 \subsubsection{PURIFY}
-Prior: Mixture of Dirac functions and Daubechies wavelet (DB1 - DB8)
+Prior: Mixture of Dirac functions and Daubechies Wavelet (DB1 - DB8)
 
 Objective: analysis
 
@@ -89,30 +92,38 @@ Objective: Synthesis
 
 Optimizer: Coordinate descent
 
+
+\subsubsection{SASIR}
+Prior: Starlets
+
+Objective: in-painting
+
+Optimizer: FISTA
+
 \pagebreak
-\subsubsection{Implementation In Casa}
+\subsection{Implementation In CASA}
 
 \begin{wrapfigure}{r}{0.6\textwidth}
 	\centering
 	\vspace{-15pt}
 	\includegraphics[width=0.9\linewidth]{./chapters/04.cs/img/casa_major_minor.png}
-	\caption{Casa Major Minor Cycle, source \cite{casa2018major}}
+	\caption{Casa Major Minor Cycle. Source \cite{casa2018major}}
 	\label{cs:major}
 	\vspace{-10pt}
 \end{wrapfigure}
 
-Terminology in CASA.
+CASA is a software package built for solving the deconvolution problem for instruments. Casa works in two separate cycles, the major and minor cycle. The major cycle fourier transforms the Visibilities to the image space and back. The minor cycle is the deconvolution algorithm, which tries to find the true image from a dirty image and a PSF. 
 
+The major cycle creates the dirty image and PSF, and at the end of the deconvolution algorithm, transforms the image back to the Fourier Space.
+
+
+In each major cycle, the Model Visibilities get updated, it is a $\mathcal{X}^2$ approximation of the Visibilities.
+
+Major cycle
 CASA is a software package built for solving the deconvolution problem for instruments like VLA and ALMA. "Data" Column measurements(calibrated), model column contains the "true" visibilities and the residual column only noise. The architecture is oriented after the CLEAN algorithm, it is split in a major and minor cycle.\ref{cs:major}. The first part of the major cycle produces the dirty image and the PSF. The minor cycle is where a deconvolution algorithm "cleans" the dirty image, several iterations of CLEAN. Major cycle ends with the forward fourier transform. Chi$^2$ approximation of the visibilities. At the end of several major cycle, the Model column should contain an approximation of the true visibilities while the Residuals should be pure noise.
 
 Wide field of view imaging aka A- and W- Projections are handled in the major cycle.  most often a CLEAN derivate.
 
-\begin{figure}
-		\centering
-		
-		\caption{Restoration Process in CASA}
-		\label{cs:restoreimage}
-\end{figure}
 
 Dirty image, Model image and cleaned image
 
