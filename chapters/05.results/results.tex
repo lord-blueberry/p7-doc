@@ -123,10 +123,15 @@ idea to combine both regularizations, get the best from both worlds. Flexibility
 
 \textbf{Starlets:} A more sophisticated try at combining both. smallest starlet is larger than the antenna beam width.
 
+
+
 [No free lunch theorem.] The regularization decides what is noise and what is true. Search for regularization that finds the true image in every observation. CS is flexible and allows for a combination of regularization.
 
 starlets finds a lot of smaller point sources, but they do
+Size of scaling function.
+
+CLEAN has the best flux reconstruction for point sources, "widends" the beam even for point sources. L1 and L2 tradeoff. Try at combining both extended emissions and point sources.
 
 Problem with memory, $x \star PSF$ gets modeled as a vector matrix multiplication $Px$. The image $x$ and $PSF$ with dimensions of $128 * 128$, result in a matrix of size $128^2 * 128^2$. The memory requirement scales quadratic with the number of pixels. 
 
-Constrained optimization worth it?
+
