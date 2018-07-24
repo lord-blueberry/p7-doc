@@ -1,26 +1,23 @@
 \section{Image Reconstruction for Interferometers}\label{intro}
 The angular resolution of a radio antenna is proportional to the wavelength divided by the dish diameter. To achieve high angular resolution the diameter should be as large as possible. But real world limitations like steering accuracy and price limit the diameter. Currently the largest single dish antenna has a diameter of about 500 meters\cite{chinaFAST}. 
   
-  
-However, Radio Interferometers, where many antennas together act as a single instrument, achieve angular resolutions that are comparable to a dish with several kilometer diameters. 
+Interferometers however, achieve high angular resolutions without the need for huge dish diameters. Several smaller antennas are spaced apart from each other. Together, they act as a single antenna. Interferometers have seen wide use in for the longer radio wavelengths with instruments like VLA, and LOFAR making numerous discoveries.
 
-In the past, interferometers like VLA, ALMA and LOFAR have made numerous discoveries.
+%The further the distance, the higher the maximum angular resolution the interferometer can achieve. several smaller antennas spaced apart from each other that act like a single large telescope.
 
-However, Radio Interferometers achieve angular resolutions that are comparable to a single dish with a diameter of several kilometers. Instead of one antenna, Interferometers use pairs of smaller antennas spaced apart.
+Interferometers do not observe the sky directly. The observed image has to be reconstructed from the measurements. The reconstruction is an ill-posed inverse problem: There may be no unique solution and a small change in the measurements can lead to a big change in the reconstructed image. In Radio Astronomy, the CLEAN class of algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are used to reconstruct the image and is the de-factor standard. It is not guaranteed to reconstruct the true image in theory. In practice it has produced remarkable results with expert tuning. 
 
-Baseline.
+New instruments like MeerKAT make new type of observations. CLEAN is rigid and is not easily adapted to new observations.
 
+The Theory of Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} has seen success in solving ill-posed inverse problems. It is flexible in its application and can be used in de-noising\cite{many}, in-painting\cite{many} and super-resolution\cite{many}.
 
-%Astronomy requires its instruments to have a high angular resolutions. This is an issue for radio wavelengths: The longer the wavelength, the bigger the diameter of a single dish antenna. Single dish antenna's are expensive to build and harder to steer accurately. Interferometers, where multiple smaller antennas act as a single large instrument, can achieve high angular resolutions while being cheaper to build. In the past, interferometers like VLA, ALMA and LOFAR have made numerous discoveries.
+%Applying Compressed Sensing to wide Field of View imaging is an active field of research. In the last decade numerous approaches have been developed showing the potential of Compressed Sensing: Accurately modelling the effects of wide Field of View imaging, while reducing the tunable parameters and possibly super-resolved images\cite{garsden2015lofar}. Current research focuses on how the effects of wide Field of View can be accurately modelled while still being computationally efficient.
 
-Interferometers do not observe the sky directly. Each antenna pair measure Fourier Components (Visibilities) of the sky brightness. The observed image has to be reconstructed from the measured Visibilites. Since the interferometer can only observe a limited number of Visibilities, the reconstruction is an ill-posed inverse problem. For small Field of View imaging, the CLEAN class of Algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} have been developed and is the de-facto standard in Radio Astronomy. It is not guaranteed to reconstruct the true image in theory. In practice it has produced remarkable results with expert tuning. New generation Interferometers like ASKAP, Pathfinder and SKA are built with wide Field of View imaging in mind. The CLEAN Algorithms have been extended for Wide Field of Views, but require even more tuning by experts. 
-
-The Theory of Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} has seen success in solving ill-posed inverse problems. It is flexible in its application and has produced remarkable results image de-noising\cite{many}, in-painting\cite{many} and super-resolution\cite{many}. Applying Compressed Sensing to wide Field of View imaging is an active field of research. In the last decade numerous approaches have been developed showing the potential of Compressed Sensing: Accurately modelling the effects of wide Field of View imaging, while reducing the tunable parameters and possibly super-resolved images\cite{garsden2015lofar}. Current research focuses on how the effects of wide Field of View can be accurately modelled while still being computationally efficient.
-
-In this project, a proof of concept Compressed Sensing approach was developed and implemented in the Common Astronomy Software Application(CASA). []The approach is focused on small Field of View imaging and the reduction of expert intervention.
+In this project, a proof of concept Compressed Sensing approach was developed and implemented in the Common Astronomy Software Application(CASA). 
+%The approach is focused on small Field of View imaging and the reduction of expert intervention.
 
 \subsection{Deconvolution: Ill-posed Inverse Problem}
-small field of view, the interferometer measures (almost) Fourier Components of the sky brightness. Inverse FFT works, it creates an image. Since but since it only measures a limited set of Fourier Components, the image is corrupted. 
+Small field of view, the interferometer measures (almost) Fourier Components of the sky brightness. Inverse FFT works, it creates an image. Since but since it only measures a limited set of Fourier Components, the image is corrupted.
 
 Try to find the true image from undersampled measurements. It is formulated as as a deconvolution problem: The corruption is modelled as a point spread function (PSF). The task is to deconvolve the dirty image, removing the corruption and restoring the original image.
 
@@ -69,8 +66,8 @@ In this project, the PSF models the instrumental effects of undersampling, anten
 
 
 \subsection{Approximation with CLEAN}
+The idea of clean is that the image consists of point sources. A point source does 
 
-%The idea of clean is that the image consists of point sources. A point source does 
 In each iteration of CLEAN, it searches the highest peak of the dirty image and removing a fraction of the PSF at that point. It stops until the next highest peak is below a threshold, or if the maximum number of iterations was reached. The fraction of the PSF, threshold and number of iterations are all tunable by the user. State of the art implementations expose even more parameters. The reconstruction quality depends on the chosen parameters and require extensive user input.
 
 CLEAN does not solve the deconvolution problem \eqref{intro:eq:deconvolve} directly. Instead, it greedily minimizes the objective \eqref{intro:eq:clean}. It is easy to see that if CLEAN minimizes the objective to zero, it has found a solution to the original deconvolution problem in a noiseless environment.
@@ -81,41 +78,32 @@ Note that the L0 norm\footnote{This is a common abuse of notation in Compressed 
 \underset{x}{minimize} \: \left \| I_{dirty} - x \star PSF \right \|_2^2 + \: \lambda \left \| x \right \|_0
 \end{equation}
 
-Since the original problem is ill-posed, the objective \eqref{intro:eq:clean} may have several zero points. In practice, CLEAN is stopped before it reaches zero. The addition of noise can add spurious peaks in the dirty image. By stopping early, CLEAN regularizes the objective. It assumes only a limited number of point sources exist in the image. The larger the magnitude of the peak, the more likely it is to be a real point source.
+Approximation of the problem.
+%Since the original problem is ill-posed, the objective \eqref{intro:eq:clean} may have several zero points. In practice, CLEAN is stopped before it reaches zero. The addition of noise can add spurious peaks in the dirty image. By stopping early, CLEAN regularizes the objective. It assumes only a limited number of point sources exist in the image. The larger the magnitude of the peak, the more likely it is to be a real point source.
 
-In short, CLEAN does a greedy approximation of the deconvolution problem, and assumes the resulting image consists out of a few point sources. The question remains, how close the CLEAN approximation is to the true image? If the true image consists out of a few point sources, CLEAN produces a good approximation. Extended emissions however are harder for CLEAN to reproduce. The peak of extended sources is lower than that of point sources. It is harder for CLEAN to distinguish extended sources from noise.
+%In short, CLEAN does a greedy approximation of the deconvolution problem, and assumes the resulting image consists out of a few point sources. The question remains, how close the CLEAN approximation is to the true image? If the true image consists out of a few point sources, CLEAN produces a good approximation. Extended emissions however are harder for CLEAN to reproduce. The peak of extended sources is lower than that of point sources. It is harder for CLEAN to distinguish extended sources from noise.
 
-The CLEAN regularization scheme is not ideal for extended sources. Ideally another way of regularization would be chosen for extended emissions, but the regularization is a fixed part of the CLEAN algorithm.
+T%he CLEAN regularization scheme is not ideal for extended sources. Ideally another way of regularization would be chosen for extended emissions, but the regularization is a fixed part of the CLEAN algorithm.
 
 
-\subsection{The Compressed Sensing Reconstruction Framework}
-In the Compressed Sensing Framework, an approach is split into three separate parts:
+\subsection{The Compressed Sensing Framework for Image Reconstruction}
+
+An image reconstruction algorithm in the Compressed Sensing Framework consists of three parts:
+
 \begin{itemize}
 	\item An objective with a data and regularization term.
-	\item A prior function $p()$ in which transforms the image into a sparse domain.
-	\item An optimization algorithm that is suited for the objective.
+	\item A prior function $p()$.
+	\item An optimization algorithm.
 \end{itemize}
 
-To demonstrate the flexibility of the Compressed Sensing Framework, we convert CLEAN into a Compressed Sensing approach. First we add a regularization term to \eqref{intro:eq:clean} and arrive at the new objective \eqref{intro:eq:csclean}. The objective contains the original CLEAN data term and a new regularization term. The data term forces the reconstruction to be close to the measurement, while the regularization term forces the reconstruction to be plausible. $\lambda$ models the expected noise in the problem. Note that the $\left \| Px \right \|_0$ acts as an indicator function. 
-
-\begin{equation}\label{intro:eq:csclean}
-	\underset{x}{minimize} \: \left \| D_{dirty} - x \star PSF \right \|_2^2 \: + \: \lambda \: p(x) 
-\end{equation}
-
-The Prior $P$ transforms the image in a sparse domain. CLEAN assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image, the Prior $P$ in Compressed Sensing CLEAN is the identity matrix.  
-
-The last step is choosing a similar optimization algorithm: In every iteration, CLEAN searches the highest peak in the dirty image. Matching Pursuit is a greedy optimization algorithm. In every iteration it searches the step which minimizes \eqref{intro:eq:csclean} the most. This Compressed Sensing approach is similar to CLEAN, but the new objective has a unique global minimum even with the presence of noise. The tunable parameters of CLEAN are replaced by a single parameter $\lambda$. 
-
-The strength of Compressed Sensing Framework is its flexibility: The CLEAN prior works well on point sources, but is not ideal for extended emissions. In this Framework, the prior $P$ can be replaced without changing the objective or the optimization algorithm. This has led to increased interest in Compressed Sensing for wide Field of View imaging.
-
-
-
-The compressed sensing framework
+The Prior $P$ transforms the image in a sparse domain. CLEAN assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image, the Prior $P$ in Compressed Sensing CLEAN is the identity matrix.
 
 Clean in the cs framework
+\begin{equation}\label{intro:eq:csclean}
+\underset{x}{minimize} \: \left \| D_{dirty} - x \star PSF \right \|_2^2 \: + \: \lambda \: p(x) 
+\end{equation}
 
-
-The guarantees of Compressed Sensing reconstruction: Incoherent from the measurement space and sparse space is sparse.
+The guarantees of Compressed Sensing Reconstruction: Incoherent from the measurement space and sparse space is sparse.
 
 Incoherence is easy. Interferometers measure in the Fourier space(This is an approximation for small field of view imaging. The approximation breaks apart in wide field of view). The image space is maximally incoherent from the Fourier space. Intuitively, A change in a single pixel will change all fourier components. A change in a single fourier component, changes all pixels.
 
@@ -128,5 +116,15 @@ Then, one can reconstruct the true image from undersampled measurements. How man
 Taking again CLEAN as an example, if we know the image contains only one point source, we can locate it with only a few Visibilities. However if the image contains many point sources located closely together, we need more Visibilities.
 
 The average case analysis is not trivial, 
+
+%In the Compressed Sensing Framework, an approach is split into three separate parts. To demonstrate the flexibility of the Compressed Sensing Framework, we convert CLEAN into a Compressed Sensing approach.
+
+% First we add a regularization term to \eqref{intro:eq:clean} and arrive at the new objective \eqref{intro:eq:csclean}. The objective contains the original CLEAN data term and a new regularization term. The data term forces the reconstruction to be close to the measurement, while the regularization term forces the reconstruction to be plausible. $\lambda$ models the expected noise in the problem. Note that the $\left \| Px \right \|_0$ acts as an indicator function. 
+
+%The last step is choosing a similar optimization algorithm: In every iteration, CLEAN searches the highest peak in the dirty image. Matching Pursuit is a greedy optimization algorithm. In every iteration it searches the step which minimizes \eqref{intro:eq:csclean} the most. This Compressed Sensing approach is similar to CLEAN, but the new objective has a unique global minimum even with the presence of noise. The tunable parameters of CLEAN are replaced by a single parameter $\lambda$. 
+
+%The strength of Compressed Sensing Framework is its flexibility: The CLEAN prior works well on point sources, but is not ideal for extended emissions. In this Framework, the prior $P$ can be replaced without changing the objective or the optimization algorithm. This has led to increased interest in Compressed Sensing for wide Field of View imaging.
+
+
 
 

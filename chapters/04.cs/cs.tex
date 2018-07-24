@@ -1,17 +1,66 @@
 \section{Compressed Sensing Image Reconstruction} \label{cs}
 
-The Framework Flexibility:
+The Framework Flexibility
 
+A lot of choice in building a reconstruction algorithm. No best
 Gurobi\cite{gurobi2018optimizer} was used
 
 
-
 \subsection{Sparseland Prior and Overcomplete Representations}
-L0, L1, L2 Priors
+The prior $p()$ in the compressed sensing framework can be any function. A valid $p()$ for example is the L2 norm.
+
+Effective priors in practice are sparseland.
+
+This has led to the idea of the sparseland prior \eqref{cs:eq:sparseDic}: We assume for our signal $x$ there exists a dictionary $D$. Each entry represents a signal part which can be present. $D$ is potentially a large, but has a finite number entries. We assume that any $x$ can only consist of a few signal parts of $D$. This means the coefficients for the signal parts in the dictionary $\alpha$ are all zero except for $s$ entries for all valid $x$. 
+
+\begin{equation} \label{cs:eq:sparseDic}
+\begin{split}
+x = D \alpha  \qquad  x \in \mathbb{R}^{n}, \alpha \in \mathbb{R}^{m}, D \in \mathbb{R}^{n*m}, \qquad n \leq m \\
+\left \| \alpha \right \|_0 = s \qquad s \ll n \leq m
+\end{split}
+\end{equation}
+
+In image compression this phenomenon was can already be observed: Images depicting nature scenes tend to be sparse in the wavelet domain. If $x$ in \eqref{cs:eq:sparseDic} are nature scenes, we can create a Dictionary $D$ of wavelets. A single image $x$ can be represented with a few wavelets, meaning the number of non-zero entries $s$ in $\alpha$ is far lower than the number of pixels $n$. All that is left to do for compression is save the non-zero entries of $\alpha$. Note that when $x$ is not a nature scene, the resulting $\alpha$ tends to have many non-zero entries and is not sparse. 
+
+In Compressed Sensing, we exploit this fact to find the most likely reconstruction from many solutions. If the sparseland prior models our signal well, the most likely reconstruction is the one with the fewest non-zero entries.
+
+for ill-posed inverse problem. 
+
+
+With that, L0 "norm" is often used.
 
 The Compressed Sensing CLEAN objective \eqref{intro:eq:csclean} uses the L0 norm for it's regularization term, which means the Objective Function is not convex. There are specialized solvers for the L0 compressed sensing. The L1 relaxation however is practically guaranteed to have the same minimum as the L0 norm and results in a convex objective function. Since Gurobi works better on the L1 relaxation it was chosen for this project.
 
 
+
+Finding the right sparseland prior is a modelling task. It codes our prior knowledge about radio sources and what they might produce. Sparseland priors are in use by for example with Starlets\cite{starck2015starlet} and Curvelets\cite{starck2003astronomical}. 
+
+Sparseland priors naturally lend themselves to overcomplete representations. D has many more rows than columns.
+
+Any combination of functions.
+
+
+\subsection{Choosing the Objective Function}
+Until now, the objective function was used as a deconvolution. This is not a requirement of Compressed Sensing. It is a design choice.
+
+Different ways of choosing the objective function with a sparseland prior.
+
+There are three different reconstruction objectives: The analysis method, where the image $x$ is minimized directly, the synthesis method where the sparse vector $\alpha$ is minimized, or by in-painting the missing Visibilities $V_2$.
+
+\begin{alignat*}{2}
+analysis:\qquad \underset{x}{minimize} \:& \left \| D_{dirty} - x \star PSF \right \|_2^2 &&+  \lambda \left \| Px \right \|_1 \\
+synthesis:\qquad \underset{\alpha}{minimize} \:& \left \| D_{dirty} - D \alpha \star PSF \right \|_2^2 &&+ \lambda \left \| \alpha \right \|_1 \\
+in-painting:\qquad \underset{V_2}{minimize} \:& \left \|  D_{dirty} - F^{-1} M V_2 \right \|_2^2 &&+ \lambda \left \| PF^{-1}V_2\right \|_1
+\end{alignat*}
+
+All three objective functions have the same global minimum. Retrieving $x$ for the analysis objective is trivial, or the second and third objective $x$ can be retrieved by $x = D\alpha$ and by $x = F^{-1}V_2$ respectively. [Empirical and theoretical studies have shown an advantage of the analysis objective over the other two \cite{something}]. However, depending on the measurement space and prior, an objective might become more practical. 
+
+The analysis and in-painting objective require the inverse of the dictionary $D^{-1}$. It exists for orthogonal transformation like the Haar Wavelet transform and for specialized over-complete dictionaries like starlets. In general, over-complete dictionaries do not have an inverse. The synthesis objective is suited for general dictionaries as it does not use the inverse.
+
+During this project, no reconstruction algorithm was found which uses the in-painting method. 
+Convolutions in image space are equivalent to a multiplication in Fourier Space.
+
+Useful when the Dictionary transformation is defined as a deconvolution.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -24,7 +73,7 @@ The flexibility allows for a lot of freedom in design which can lead to differen
 %In this project, the GuRoBi optimization algorithm was used. It uses the Simplex to solve the quadratic programming problems. It  out to be not ideal for the Inverse Problems of Radio Astronomy. However
 
 \subsection{The Sparseland Prior and Incoherence: How Compressed Sensing works}
-For Compressed Sensing we need a Prior $P$ in which our signal can be sparsely represented. It is not guaranteed that such a space exists, but for natural signals there always seem to be. This has led to the idea of the Sparseland Prior \eqref{cs:eq:sparseDic} which is at the core of Compressed Sensing: We assume for our signal $x$ there exists a dictionary $D$. Each entry represents a signal part which can be present. $D$ is potentially a large, but has a finite number entries. We assume that any $x$ can only consist of a few signal parts of $D$. This means the coefficients for the signal parts in the dictionary $\alpha$ are all zero except for $s$ entries for all valid $x$. 
+For Compressed Sensing we need a Prior $P$ in which our signal can be sparsely represented. It is not guaranteed that such a space exists, but for natural signals there always seem to be. This has led to the idea of the sparseland prior \eqref{cs:eq:sparseDic} which is at the core of Compressed Sensing: We assume for our signal $x$ there exists a dictionary $D$. Each entry represents a signal part which can be present. $D$ is potentially a large, but has a finite number entries. We assume that any $x$ can only consist of a few signal parts of $D$. This means the coefficients for the signal parts in the dictionary $\alpha$ are all zero except for $s$ entries for all valid $x$. 
 
 \begin{equation} \label{cs:eq:sparseDic}
 	\begin{split}
@@ -54,12 +103,20 @@ An appropriate prior for Radio Astronomy is still under research, currently Star
 There are three different Compressed Sensing objectives: The analysis method, where the image $x$ is minimized directly, the synthesis method where the sparse vector $\alpha$ is minimized, or by in-painting the missing Visibilities $V_2$.
 
 \begin{alignat*}{2}
-	analysis:\qquad \underset{x}{minimize} \:& \left \| D_{dirty} - x \star PSF \right \|_2^2 &&+  \lambda \left \| Px \right \|_1 \\
+	analysis:\qquad \underset{x}{minimize} \:& \left \| D_{dirty} - x \star PSF \right \|_2^2 &&+  \lambda \left \| D^{-1}x \right \|_1 \\
 	synthesis:\qquad \underset{\alpha}{minimize} \:& \left \| D_{dirty} - D \alpha \star PSF \right \|_2^2 &&+ \lambda \left \| \alpha \right \|_1 \\
-	in-painting:\qquad \underset{V_2}{minimize} \:& \left \|  D_{dirty} - F^{-1} M V_2 \right \|_2^2 &&+ \lambda \left \| PF^{-1}V_2\right \|_1
+	in-painting:\qquad \underset{V_2}{minimize} \:& \left \|  D_{dirty} - M V_2 \right \|_2^2 &&+ \lambda \left \| D^{-1}F^{-1}V_2\right \|_1
 \end{alignat*}
 
-All three objective functions have the same global minimum. Retrieving $x$ for the analysis objective is trivial, or the second and third objective $x$ can be retrieved by $x = D\alpha$ and by $x = F^{-1}V_2$ respectively. [Empirical and theoretical studies have shown an advantage of the analysis objective over the other two \cite{something}]. However, depending on the measurement space, prior and optimization algorithm, one objective may be easier to solve than others. The analysis objective is not useful when there is no transformation from $x$ into the sparse space. This is the case for most over-complete priors: In that case, $P$ is a $m*n$ matrix and  $Px \ne \alpha$. The synthesis method just requires a transformation from the sparse space to image $D\alpha = x$. Similarly one might chose the in-painting method when the prior is a convolution in image space: Convolutions in image space are equivalent to a multiplication in Fourier Space.
+All three objective functions have the same global minimum. Retrieving $x$ for the analysis objective is trivial, or the second and third objective $x$ can be retrieved by $x = D\alpha$ and by $x = F^{-1}V_2$ respectively. [Empirical and theoretical studies have shown an advantage of the analysis objective over the other two \cite{something}]. However, depending on the measurement space and prior, an objective might become more practical.
+
+The analysis and in-painting objective require the inverse of the dictionary $D^{-1}$. It exists for orthogonal transformation like the Haar Wavelet transform and for specialized over-complete dictionaries like starlets. In general, over-complete dictionaries do not have an inverse. The synthesis objective is suited for general dictionaries as it does not use the inverse.
+
+During this project, no reconstruction algorithm was found which uses the in-painting method. 
+Convolutions in image space are equivalent to a multiplication in Fourier Space.
+Useful when the Dictionary transformation is defined as a deconvolution.
+
+The analysis objective is not useful when there is no transformation from $x$ into the sparse space. This is the case for most over-complete priors: In that case, $P$ is a $m*n$ matrix and  $Px \ne \alpha$. The synthesis method just requires a transformation from the sparse space to image $D\alpha = x$. Similarly one might chose the in-painting method when the prior is a convolution in image space: 
 
 wide field imaging considerations
 \begin{equation}\label{cs:eq:wfield}
@@ -96,7 +153,8 @@ Optimizer: Coordinate descent
 \subsubsection{SASIR}
 Prior: Starlets
 
-Objective: in-painting
+Objective: analysis
+
 
 Optimizer: FISTA
 
@@ -112,24 +170,19 @@ Optimizer: FISTA
 	\vspace{-10pt}
 \end{wrapfigure}
 
-CASA is a software package built for solving the deconvolution problem for instruments. Casa works in two separate cycles, the major and minor cycle. The major cycle fourier transforms the Visibilities to the image space and back. The minor cycle is the deconvolution algorithm, which tries to find the true image from a dirty image and a PSF. 
+CASA is a software package built for reconstructing images for VLA. 
 
-The major cycle creates the dirty image and PSF, and at the end of the deconvolution algorithm, transforms the image back to the Fourier Space.
+CASA works in two separate cycles, the major and minor cycle. The major cycle transforms the Visibilities to image space and back using the Fourier Transform. The minor cycle is the deconvolution algorithm, which tries to find the true image from a dirty image and a PSF. 
 
+The first major cycle iteration creates the PSF and the dirty image. Then, several minor cycle deconvolve the dirty image. The major cycle then continues, transforms the deconvolved image back to Visibilities. The major cycle ends by calculating the residual Visibilities from the measurement and the deconvolution. The next major cycle continues by transforming the residual Visibilities. At the end of several major cycle, the model column should contain an approximation of the true visibilities while the residuals should be noise. %it is a $\mathcal{X}^2$ approximation of the Visibilities.
 
-In each major cycle, the Model Visibilities get updated, it is a $\mathcal{X}^2$ approximation of the Visibilities.
+In CASA the major cycle is fixed. It was evaluated if it can be modified, but a modification was too time consuming in the context of the project. However CASA allows for the addition of new deconvolution algorithms. 
 
-Major cycle
-CASA is a software package built for solving the deconvolution problem for instruments like VLA and ALMA. "Data" Column measurements(calibrated), model column contains the "true" visibilities and the residual column only noise. The architecture is oriented after the CLEAN algorithm, it is split in a major and minor cycle.\ref{cs:major}. The first part of the major cycle produces the dirty image and the PSF. The minor cycle is where a deconvolution algorithm "cleans" the dirty image, several iterations of CLEAN. Major cycle ends with the forward fourier transform. Chi$^2$ approximation of the visibilities. At the end of several major cycle, the Model column should contain an approximation of the true visibilities while the Residuals should be pure noise.
+%CASA is a software package built for solving the deconvolution problem for instruments like VLA and ALMA. "Data" Column measurements(calibrated), model column contains the "true" visibilities and the residual column only noise. The architecture is oriented after the CLEAN algorithm, it is split in a major and minor cycle.\ref{cs:major}. The first part of the major cycle produces the dirty image and the PSF. The minor cycle is where a deconvolution algorithm "cleans" the dirty image, several iterations of CLEAN. Major cycle ends with the forward fourier transform. Chi$^2$ approximation of the visibilities.
 
-Wide field of view imaging aka A- and W- Projections are handled in the major cycle.  most often a CLEAN derivate.
+%The idea of the dirty beam and the clean beam. The output of CASA is the model image convolved with the clean beam plus residuals. Because the model image contains many small peaks, any structure smaller than the clean beam is implausible. Convolving with a gaussian is essentially reducing the resolution. But this is not the case. CLEAN can lead to implausible model images depending on the content: If only a few point sources are visible, clean is plausibe. But for extended emissions clean produces a an area of many peaks which is not true.. With compressed sensing, the ideal prior leads to the true model image. 
 
-
-Dirty image, Model image and cleaned image
-
-The idea of the dirty beam and the clean beam. The output of CASA is the model image convolved with the clean beam plus residuals. Because the model image contains many small peaks, any structure smaller than the clean beam is implausible. Convolving with a gaussian is essentially reducing the resolution. But this is not the case. CLEAN can lead to implausible model images depending on the content: If only a few point sources are visible, clean is plausibe. But for extended emissions clean produces a an area of many peaks which is not true.. With compressed sensing, the ideal prior leads to the true model image. 
-
-CASA can be extended new deconvolution algorithms, changing minor cycles. During the project it was evaluated if CASA could be modified so wide Field of View imaging can handled by the minor cycle. It was not possible. The implementation is restricted to the deconvolution in the data term. This excludes the in-painting objective function. Or that the data term minimizes on the Visibilities directly.
+%CASA can be extended new deconvolution algorithms, changing minor cycles. During the project it was evaluated if CASA could be modified so wide Field of View imaging can handled by the minor cycle. It was not possible. The implementation is restricted to the deconvolution in the data term. This excludes the in-painting objective function. Or that the data term minimizes on the Visibilities directly.
 
 
 
