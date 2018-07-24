@@ -1,33 +1,51 @@
 \section{Image Reconstruction for Interferometers}\label{intro}
 The angular resolution of a radio antenna is proportional to the wavelength divided by the dish diameter. To achieve high angular resolution the diameter should be as large as possible. But real world limitations like steering accuracy and price limit the diameter. Currently the largest single dish antenna has a diameter of about 500 meters\cite{chinaFAST}. 
   
-Interferometers however, achieve high angular resolutions without the need for huge dish diameters. Several smaller antennas are spaced apart from each other. Together, they act as a single antenna. Interferometers have seen wide use in for the longer radio wavelengths with instruments like VLA, and LOFAR making numerous discoveries.
+Interferometers however, achieve high angular resolutions without the need for huge dish diameters. Several smaller antennas are spaced apart from each other. Together, they act as a single antenna. Interferometers have seen wide use in for radio wavelengths with instruments like VLA and LOFAR.
 
 %The further the distance, the higher the maximum angular resolution the interferometer can achieve. several smaller antennas spaced apart from each other that act like a single large telescope.
 
-Interferometers do not observe the sky directly. The observed image has to be reconstructed from the measurements. The reconstruction is an ill-posed inverse problem: There may be no unique solution and a small change in the measurements can lead to a big change in the reconstructed image. In Radio Astronomy, the CLEAN class of algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are used to reconstruct the image and is the de-factor standard. It is not guaranteed to reconstruct the true image in theory. In practice it has produced remarkable results with expert tuning. 
+Interferometers do not observe the sky directly. The observed image has to be reconstructed from the measurements. The reconstruction is an ill-posed inverse problem: There may be no unique solution and a small change in the measurements can lead to a big change in the reconstructed image. In Radio Astronomy, the CLEAN class of algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are used to reconstruct the image and is the de-factor standard. 
 
-New instruments like MeerKAT make new type of observations. CLEAN is rigid and is not easily adapted to new observations.
+New Interferometers on the horizon with SKA. To improve reconstruction, we would like to model our prior knowledge about the. New observations new effects. CLEAN has a rigid assumption about what the reconstructed image should look like. It cannot be adapted as our knowledge of the universe changes.
 
-The Theory of Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} has seen success in solving ill-posed inverse problems. It is flexible in its application and can be used in de-noising\cite{many}, in-painting\cite{many} and super-resolution\cite{many}.
+The Theory of Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} has seen success in solving ill-posed inverse problems. 
+
+It is flexible in its application and can be used in de-noising\cite{many}, in-painting\cite{many} and super-resolution\cite{many}.
+
+Using prior knowledge about the reconstructed image. 
+Push to a plausible image reconstruction
 
 %Applying Compressed Sensing to wide Field of View imaging is an active field of research. In the last decade numerous approaches have been developed showing the potential of Compressed Sensing: Accurately modelling the effects of wide Field of View imaging, while reducing the tunable parameters and possibly super-resolved images\cite{garsden2015lofar}. Current research focuses on how the effects of wide Field of View can be accurately modelled while still being computationally efficient.
 
-In this project, a proof of concept Compressed Sensing approach was developed and implemented in the Common Astronomy Software Application(CASA). 
+In this project, a proof of concept Compressed Sensing reconstruction algorithm was developed and implemented in the Common Astronomy Software Application(CASA). 
+
 %The approach is focused on small Field of View imaging and the reduction of expert intervention.
 
 \subsection{Deconvolution: Ill-posed Inverse Problem}
-Small field of view, the interferometer measures (almost) Fourier Components of the sky brightness. Inverse FFT works, it creates an image. Since but since it only measures a limited set of Fourier Components, the image is corrupted.
+Interferometers do not observe the image directly. Instead, they measure approximately three dimensional Fourier components. An accurate measurement equation and are important for wide field of view imaging. In this project small field of view reconstruction was considered. For small field of View, the measurement equation can be approximated by the two dimensional Fourier Components(Visibility). Each antenna pair measures a complex Visibility. Therefore the observed image can be calculated from the (small field of view) observations by using the two dimensional Fourier Transform.
 
-Try to find the true image from undersampled measurements. It is formulated as as a deconvolution problem: The corruption is modelled as a point spread function (PSF). The task is to deconvolve the dirty image, removing the corruption and restoring the original image.
+If the interferometer could sample all Visibilities, then the Fourier Transform would produce the observed image. However, since there are a limited number of antenna pairs, we  measure the same limited number of Visibilities. The measurement is under-sampled and the image of the Fourier Transform is "dirty". The undersampling convolves the observed image with a point spread function(PSF). The task is to deconvolve the image and remove the effects of undersampling \eqref{intro:eq:deconvolve}.
 
 \begin{equation}\label{intro:eq:deconvolve}
 x \star  PSF + N = I_{dirty} 
 \end{equation}
 
-CASA produces a dirty image and a PSF.
+the PSF models the instrumental effects of undersampling, antenna beam patterns.
+The point spread function models the instrument effects. The task is now to deconvolve the image in a noisy environment.  .
 
-In this project, the PSF models the instrumental effects of undersampling, antenna beam patterns. This problem 
+Equation \eqref{intro:eq:deconvolve} is an ill posed problem::
+\begin{itemize}
+	\item It is unknown if a solution exists
+	\item There may be many solutions
+	\item a small change in the measurement may lead to very different solutions 
+\end{itemize}
+
+incoherence
+
+
+CASA produces a the $I_{dirty}$ image and the PSF. T
+
 
 %Each antenna pair measures a complex Visibility of the sky brightness. The distance between the antennas, the baseline, dictates the sample point in the Fourier Space (called UV-Space). Longer baselines sample higher frequency components, while shorter baselines sample lower frequency components. 
 
@@ -66,19 +84,19 @@ In this project, the PSF models the instrumental effects of undersampling, anten
 
 
 \subsection{Approximation with CLEAN}
-The idea of clean is that the image consists of point sources. A point source does 
+CLEAN assumes the observed image contains several bright point sources. In each iteration of CLEAN, it searches the highest peak of the dirty image and removes a fraction of the PSF. It stops until the next highest peak is below a threshold, or if the maximum number of iterations was reached. The fraction of the PSF, threshold and number of iterations are all tunable by the user.
 
-In each iteration of CLEAN, it searches the highest peak of the dirty image and removing a fraction of the PSF at that point. It stops until the next highest peak is below a threshold, or if the maximum number of iterations was reached. The fraction of the PSF, threshold and number of iterations are all tunable by the user. State of the art implementations expose even more parameters. The reconstruction quality depends on the chosen parameters and require extensive user input.
-
-CLEAN does not solve the deconvolution problem \eqref{intro:eq:deconvolve} directly. Instead, it greedily minimizes the objective \eqref{intro:eq:clean}. It is easy to see that if CLEAN minimizes the objective to zero, it has found a solution to the original deconvolution problem in a noiseless environment.
-
+It works as an approximation of the original problem. It greedily minimizes the objective \eqref{intro:eq:clean}. 
 Note that the L0 norm\footnote{This is a common abuse of notation in Compressed Sensing literature: The "L0 norm" is not a norm.} acts as the indicator\footnote{For the L0 norm to work we need to define $0^0 = 0$} function.
 
 \begin{equation}\label{intro:eq:clean}
-\underset{x}{minimize} \: \left \| I_{dirty} - x \star PSF \right \|_2^2 + \: \lambda \left \| x \right \|_0
+\underset{x}{minimize} \: \left \| I_{dirty} - x \star PSF \right \|_2^2 + \: \left \| x \right \|_0
 \end{equation}
 
-Approximation of the problem.
+Regularization term, minimum, non-convex function (It may have local minima). but CLEAN does not minimize
+
+CLEAN works well when the observed image is indeed contains only point sources. However, the new interferometers have more complex observations, extended emissions. CLEAN regularization scheme is a fixed part of the algorithm. 
+
 %Since the original problem is ill-posed, the objective \eqref{intro:eq:clean} may have several zero points. In practice, CLEAN is stopped before it reaches zero. The addition of noise can add spurious peaks in the dirty image. By stopping early, CLEAN regularizes the objective. It assumes only a limited number of point sources exist in the image. The larger the magnitude of the peak, the more likely it is to be a real point source.
 
 %In short, CLEAN does a greedy approximation of the deconvolution problem, and assumes the resulting image consists out of a few point sources. The question remains, how close the CLEAN approximation is to the true image? If the true image consists out of a few point sources, CLEAN produces a good approximation. Extended emissions however are harder for CLEAN to reproduce. The peak of extended sources is lower than that of point sources. It is harder for CLEAN to distinguish extended sources from noise.
@@ -87,21 +105,23 @@ T%he CLEAN regularization scheme is not ideal for extended sources. Ideally anot
 
 
 \subsection{The Compressed Sensing Framework for Image Reconstruction}
-
 An image reconstruction algorithm in the Compressed Sensing Framework consists of three parts:
 
 \begin{itemize}
-	\item An objective with a data and regularization term.
 	\item A prior function $p()$.
 	\item An optimization algorithm.
+	\item An objective with a data and regularization term.
 \end{itemize}
 
-The Prior $P$ transforms the image in a sparse domain. CLEAN assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image, the Prior $P$ in Compressed Sensing CLEAN is the identity matrix.
+CLEAN is a Compressed Sensing Reconstruction algorithm with specific choices for prior, optimization algorithm. and objective. The prior in CLEAN is the L0 "norm", Matching Pursuit as the optimization algorithm. The objective from CLEAN needs a additional parameter $\lambda$. We arrive at \eqref{intro:eq:csclean}. which represents the tradeoff between accurate deconvolution and regularization. the more noisy it is, the more regularization is needed.
 
-Clean in the cs framework
 \begin{equation}\label{intro:eq:csclean}
 \underset{x}{minimize} \: \left \| D_{dirty} - x \star PSF \right \|_2^2 \: + \: \lambda \: p(x) 
 \end{equation}
+
+The Prior $P$ transforms the image in a sparse domain. CLEAN assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image, the Prior $P$ in Compressed Sensing CLEAN is the identity matrix
+
+With $\lambda$ we can minimize the objective 
 
 The guarantees of Compressed Sensing Reconstruction: Incoherent from the measurement space and sparse space is sparse.
 

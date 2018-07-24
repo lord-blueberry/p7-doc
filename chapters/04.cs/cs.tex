@@ -90,7 +90,7 @@ Was chosen because it has an inverse. Multiscale effects included in prior.
 Scaling function
 Prior: Starlets
 
-Objective: analysis
+Objective: synthesis
 
 
 Optimizer: FISTA
@@ -114,6 +114,13 @@ CASA works in two separate cycles, the major and minor cycle. The major cycle tr
 The first major cycle iteration creates the PSF and the dirty image. Then, several minor cycle deconvolve the dirty image. The major cycle then continues, transforms the deconvolved image back to Visibilities. The major cycle ends by calculating the residual Visibilities from the measurement and the deconvolution. The next major cycle continues by transforming the residual Visibilities. At the end of several major cycle, the model column should contain an approximation of the true visibilities while the residuals should be noise. %it is a $\mathcal{X}^2$ approximation of the Visibilities.
 
 In CASA the major cycle is fixed. It was evaluated if it can be modified, but a modification was too time consuming in the context of the project. However CASA allows for the addition of new deconvolution algorithms. 
+
+Compressed Sensing Algorithm was implemented as a CASA deconvolver. The Data term of the objective is fixed to be the deconvolution ($D_{dirty} x \star PSf$). 
+
+
+Major cycle is more expensive to compute than a CLEAN minor cylce. 
+
+CLEAN needs potentially many major cycle iterations. A Compressed Sensing Reconstruction would converge to the optimum in one major cylce. Here lies a potential speedup for the Compressed Sensing Reconstruction.
 
 %CASA is a software package built for solving the deconvolution problem for instruments like VLA and ALMA. "Data" Column measurements(calibrated), model column contains the "true" visibilities and the residual column only noise. The architecture is oriented after the CLEAN algorithm, it is split in a major and minor cycle.\ref{cs:major}. The first part of the major cycle produces the dirty image and the PSF. The minor cycle is where a deconvolution algorithm "cleans" the dirty image, several iterations of CLEAN. Major cycle ends with the forward fourier transform. Chi$^2$ approximation of the visibilities.
 
