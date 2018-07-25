@@ -8,7 +8,15 @@ Gurobi\cite{gurobi2018optimizer} was used.constrained optimization.
 
 
 \subsection{Sparseland Prior and Overcomplete Representations}
-The prior $p()$ can be any function. In practice, sparseland priors \eqref{cs:eq:sparseDic} have been used for Compressed Sensing reconstruction: For our signal $x$ we create a dictionary $D$. Each entry in $D$ represents a signal part of $x$. $D$ is potentially a large, but has a finite number entries. However, any $x$ we measure consists only of a few entries of $D$. This means the coefficients for the signal parts in the dictionary $\alpha$ are all zero except for $s$ entries for all valid $x$. 
+The prior $p()$ can be any function like the LP norm.
+
+We could use L2, but what we mostly want in Compressed Sensing Reconstruction is sparsity. 
+With that, L0 "norm" is often used. 
+
+
+The L1 relaxation however is practically guaranteed to have the same minimum as the L0 norm and results in a convex objective function. Since Gurobi works better on the L1 relaxation it was chosen for this project.
+
+In practice, sparseland priors \eqref{cs:eq:sparseDic} have been used for Compressed Sensing reconstruction: For our signal $x$ we create a dictionary $D$. Each entry in $D$ represents a signal part of $x$. $D$ is potentially a large, but has a finite number entries. However, any $x$ we measure consists only of a few entries of $D$. This means the coefficients for the signal parts in the dictionary $\alpha$ are all zero except for $s$ entries for all valid $x$. 
 
 \begin{equation} \label{cs:eq:sparseDic}
 \begin{split}
@@ -17,7 +25,7 @@ x = D \alpha  \qquad  x \in \mathbb{R}^{n}, \alpha \in \mathbb{R}^{m}, D \in \ma
 \end{split}
 \end{equation}
 
-In other words, we create a dictionary $D$ in which our signal can be sparsely represented. Together with the L0 "norm", the sparseland prior can be thought of as a detector for our signal. Any valid $x$ can be sparsely represented, but noise tends to affect all entries.
+In other words, we create a dictionary $D$ in which our signal can be sparsely represented. Together with the L1 norm, the sparseland prior can be thought of as a detector for our signal. Any valid $x$ can be sparsely represented, but noise tends to affect all entries.
 
 In the Compressed Sensing Reconstruction we want to find our $x$ in a noisy environment. The optimization algorithm locates the $s$ significant entries in $\alpha$ and throws away the rest.
 
@@ -35,17 +43,6 @@ Sparseland priors naturally lend themselves to overcomplete representations. D h
 
 
 
-for ill-posed inverse problem. 
-
-
-With that, L0 "norm" is often used.
-
-The Compressed Sensing CLEAN objective \eqref{intro:eq:csclean} uses the L0 norm for it's regularization term, which means the Objective Function is not convex. There are specialized solvers for the L0 compressed sensing. The L1 relaxation however is practically guaranteed to have the same minimum as the L0 norm and results in a convex objective function. Since Gurobi works better on the L1 relaxation it was chosen for this project.
-
-
-
-
-.
 
 
 \subsection{Choosing the Objective Function}
