@@ -60,10 +60,14 @@ The CLEAN algorithm gets compared to Compressed Sensing Reconstructions. The par
 	\item Starlet Transform
 \end{enumerate}
 
-Each Prior has a $\lambda$, it changes for each prior. The Miller\cite{miller1970least} $\lambda$ estimation was used and is shown in equation \eqref{results:eq:miller}. For the estimation an approximation of the solution $x$ is needed. In this project, the deconvolution was calculated without regularization and used to estimate the $\lambda$ parameter for each prior.
+Each Prior has a $\lambda$, it changes for each prior. The Miller\cite{miller1970least} $\lambda$ estimation was used and is shown in equation \eqref{results:eq:miller}. 
+
+Estimate the noise. $e$ is about estimating what? while $E$
+
+For the estimation an approximation of the solution $x$ is needed. In this project, the deconvolution was calculated without regularization and used to estimate the $\lambda$ parameter for each prior.
 
 \begin{equation}\label{results:eq:miller}
-	\lambda \approx e / E
+	\lambda \approx e / E \qquad  \left \| I_{dirty} - x \star PSF \right \|_2^2 \le e \qquad p(x) \le E
 \end{equation}
 
 two figures, one with all reconstructed images for all algorithms. A cut through the image showing the intensity profile.
@@ -130,7 +134,7 @@ idea to combine both regularizations, get the best from both worlds. Flexibility
 starlets finds a lot of smaller point sources, but they do
 Size of scaling function.
 
-CLEAN has the best flux reconstruction for point sources, "widends" the beam even for point sources. L1 and L2 tradeoff. Try at combining both extended emissions and point sources.
+CLEAN has the best flux reconstruction for point sources the beam even for point sources. L1 and L2 tradeoff. Try at combining both extended emissions and point sources.
 
 Problem with memory, $x \star PSF$ gets modeled as a vector matrix multiplication $Px$. The image $x$ and $PSF$ with dimensions of $128 * 128$, result in a matrix of size $128^2 * 128^2$. The memory requirement scales quadratic with the number of pixels. 
 

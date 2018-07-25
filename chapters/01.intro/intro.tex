@@ -93,7 +93,10 @@ Note that the L0 norm\footnote{This is a common abuse of notation in Compressed 
 \underset{x}{minimize} \: \left \| I_{dirty} - x \star PSF \right \|_2^2 + \: \left \| x \right \|_0
 \end{equation}
 
-Regularization term, minimum, non-convex function (It may have local minima). but CLEAN does not minimize
+Regularization term, minimum, non-convex function (It may have local minima). 
+The L0 "norm" makes this problem for non-convex: It may  it is in NP-Hard. There exist optimizer like Matching Pursuit that approximate the solution well enough for practice.
+
+but CLEAN does not minimize to an optima, it stops early. Hard to analyse how close the current solution is to the true minimum.
 
 CLEAN works well when the observed image is indeed contains only point sources. However, the new interferometers have more complex observations, extended emissions. CLEAN regularization scheme is a fixed part of the algorithm. 
 
@@ -113,15 +116,24 @@ An image reconstruction algorithm in the Compressed Sensing Framework consists o
 	\item An objective with a data and regularization term.
 \end{itemize}
 
-CLEAN is a Compressed Sensing Reconstruction algorithm with specific choices for prior, optimization algorithm. and objective. The prior in CLEAN is the L0 "norm", Matching Pursuit as the optimization algorithm. The objective from CLEAN needs a additional parameter $\lambda$. We arrive at \eqref{intro:eq:csclean}. which represents the tradeoff between accurate deconvolution and regularization. the more noisy it is, the more regularization is needed.
+CLEAN is a Compressed Sensing Reconstruction algorithm with specific choices for prior, optimization algorithm. and objective. The prior $p()$ in CLEAN is the L0 "norm", Matching Pursuit as the optimization algorithm. The objective from CLEAN needs a additional parameter $\lambda$.  which represents the tradeoff between accurate deconvolution and regularization. the more noisy it is, the more regularization is needed. We arrive at the similar \eqref{intro:eq:csclean}.
 
 \begin{equation}\label{intro:eq:csclean}
 \underset{x}{minimize} \: \left \| D_{dirty} - x \star PSF \right \|_2^2 \: + \: \lambda \: p(x) 
 \end{equation}
 
-The Prior $P$ transforms the image in a sparse domain. CLEAN assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image, the Prior $P$ in Compressed Sensing CLEAN is the identity matrix
+All that was changes was an additional parameter $\lambda$, so why would one want to do this? 
+Applying non-convex optimization techniques,
+Theoretical guarantees of compressed Sensing.
+Replacing $p()$ with anything else
 
-With $\lambda$ we can minimize the objective 
+Now we can minimize \eqref{intro:eq:csclean} with non-convex optimization techniques, we can analyse how calculate lower limits for the objective.
+
+
+We assume $x$ assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image.
+
+
+Compressed sensing reconstruction is able to reconstruct the observation even from undersampled measurements. Even though shannon-nyquist theorem is higher.
 
 The guarantees of Compressed Sensing Reconstruction: Incoherent from the measurement space and sparse space is sparse.
 
@@ -136,6 +148,8 @@ Then, one can reconstruct the true image from undersampled measurements. How man
 Taking again CLEAN as an example, if we know the image contains only one point source, we can locate it with only a few Visibilities. However if the image contains many point sources located closely together, we need more Visibilities.
 
 The average case analysis is not trivial, 
+
+The prior and the optimization algorithm are disconnected and the prior $p()$ can be replaced for example with the L2 norm.
 
 %In the Compressed Sensing Framework, an approach is split into three separate parts. To demonstrate the flexibility of the Compressed Sensing Framework, we convert CLEAN into a Compressed Sensing approach.
 
