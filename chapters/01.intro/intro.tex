@@ -3,9 +3,9 @@ The angular resolution of a radio antenna is proportional to the wavelength divi
   
 Interferometers however, achieve high angular resolutions without the need for huge dish diameters. Several smaller antennas are spaced apart from each other. Together, they act as a single antenna. Interferometers have seen wide use in for radio wavelengths with instruments like VLA and LOFAR.
 
-%The further the distance, the higher the maximum angular resolution the interferometer can achieve. several smaller antennas spaced apart from each other that act like a single large telescope.
+Interferometers do not observe the sky directly. The observed image has to be reconstructed from the measurements. The reconstruction is an ill-posed inverse problem. In Radio Astronomy, the CLEAN class of algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are used to reconstruct the image and is the de-factor standard. 
 
-Interferometers do not observe the sky directly. The observed image has to be reconstructed from the measurements. The reconstruction is an ill-posed inverse problem: There may be no unique solution and a small change in the measurements can lead to a big change in the reconstructed image. In Radio Astronomy, the CLEAN class of algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are used to reconstruct the image and is the de-factor standard. 
+Fixed assumption about the image
 
 New Interferometers on the horizon with SKA. To improve reconstruction, we would like to model our prior knowledge about the. New observations new effects. CLEAN has a rigid assumption about what the reconstructed image should look like. It cannot be adapted as our knowledge of the universe changes.
 
@@ -20,7 +20,6 @@ Push to a plausible image reconstruction
 
 In this project, a proof of concept Compressed Sensing reconstruction algorithm was developed and implemented in the Common Astronomy Software Application(CASA). 
 
-%The approach is focused on small Field of View imaging and the reduction of expert intervention.
 
 \subsection{Deconvolution: Ill-posed Inverse Problem}
 Interferometers do not observe the image directly. Instead, they measure approximately three dimensional Fourier components. An accurate measurement equation and are important for wide field of view imaging. In this project small field of view reconstruction was considered. For small field of View, the measurement equation can be approximated by the two dimensional Fourier Components(Visibility). Each antenna pair measures a complex Visibility. Therefore the observed image can be calculated from the (small field of view) observations by using the two dimensional Fourier Transform.
@@ -44,7 +43,7 @@ Equation \eqref{intro:eq:deconvolve} is an ill posed problem::
 incoherence
 
 
-CASA produces a the $I_{dirty}$ image and the PSF. T
+CASA produces a the $I_{dirty}$ image and the PSF.
 
 
 %Each antenna pair measures a complex Visibility of the sky brightness. The distance between the antennas, the baseline, dictates the sample point in the Fourier Space (called UV-Space). Longer baselines sample higher frequency components, while shorter baselines sample lower frequency components. 

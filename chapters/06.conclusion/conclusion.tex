@@ -1,15 +1,11 @@
-\section{Conclusion and Future Development}
-Flexible approach.
+\section{Future Compressed Sensing Reconstruction}
+Compressed Sensing Reconstructions allow the exchange of priors. New prior knowledge can be incorporated without changing the underlying objective or the optimization algorithm.
 
 Flexibility allows multiple ways to solve the same problem. Optimal solution does not exist yet. 
 
-Potential to reduce the needed parameters. Compressed Sensing by design has the $\lambda$ parameter. In practice, the parameter can be estimated.
+A proof of Compressed Sensing Reconstruction was implemented in CASA as a deconvolver. It was shown that with Compressed Sensing, one is potentially able to super-resolve sources. However, the current implementation has a quadratic memory requirement, it does not scale to image sizes which are used in practice. New interferometers like MeerKAT will require an even higher amount of pixels. The data amount will scale up by several factors compared to VLA and require scalable image reconstruction. Futhermore, they are built with wide field of view imaging in mind. 
 
-Limited through CASA interface. and the chosen Optimization Algorithm
+Calibration for these instruments get more complicated. Compressed Sensing Reconstructions are flexible enough and can potentially improve self-calibration tasks.
 
-small Field of View. 
+The next step is to add the effects of wide field of view imaging and see how they scale.
 
-
-Currently infeasible for large scale, new larger instruments.
-
-The calibration and self-calibration tasks were not further investigated, but here too does compressed sensing have potential to help.
