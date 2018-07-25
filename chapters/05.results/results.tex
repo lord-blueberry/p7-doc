@@ -112,16 +112,19 @@ Two figures compare the Dirty Image, CLEAN and the Compressed Sensing Reconstrut
 
 \begin{figure}
 	\centering
-	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth, trim={180px 170px 160px 136px}, clip]{./chapters/05.results/pic_G55_7_lined.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/05.results/raw_image_lined.png}
-	\end{subfigure}
+
 	\caption{profile cut}
 \end{figure}
 
 \begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.3\linewidth}
+		\includegraphics[width=\linewidth, trim={180px 170px 170px 146px}, clip]{./chapters/05.results/pic_G55_7_lined.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.3\linewidth}
+		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/05.results/raw_image_lined.png}
+	\end{subfigure}
+
 	\includegraphics[width=\linewidth, clip]{./chapters/05.results/tmp0.png}
 	\includegraphics[width=\linewidth, clip]{./chapters/05.results/tmp1.png}
 	\caption{Intensity profile of CLEAN and the different Compressed Sensing priors.}
@@ -136,11 +139,12 @@ Two figures compare the Dirty Image, CLEAN and the Compressed Sensing Reconstrut
 
 \textbf{L2:} Forces the extended emissions to be more plausible, although it considerably lowers the flux of bright point sources. The profile \ref{res:g55:profile} shows L2 forces the bright peak to widen and lower. The peak is almost as wide as the CLEAN reconstruction. In the remnant center, it smoothers the two fainter peaks.
 
-\textbf{L1+L2}: Since L1 does a good job with point sources, but needs to be more continuous for extended emissions, why does one not combine both regularizations? The flexibility of Compressed Sensing Reconstructions allows for it. In reality, Tradeoff between point sources and extended. How to chose the tradeoff is not trivial, here it was assumed to be  equal. In this example, all pixels are very close to zero (Maximum: 0.0076 in Dirty Image), Miller lambda estimation is dominated by the L1 term while the L2 term gets neglected. The larger the values in the dirty image, the more L2 dominates over L1. Combination is not trivial.
+\textbf{L1+L2}: Since L1 does a good job with point sources, but needs to be more continuous for extended emissions, why does one not combine both regularizations? The flexibility of Compressed Sensing Reconstructions allows for it. Sadly, the result is indistinguishable from the L1 regularization. In the dirty image, all pixels are very close to zero (Maximum: 0.0076 in Dirty Image). If the L1 and L2 regularization receive the same $\lambda$, the L1 term dominates. If the dirty image would contain pixels much larger than 1, then the L2 term would dominate.
 
 \textbf{Total Variation:} Simple prior that was used in Image denoising. Reduces the gradient over the whole image. [It tries to have as few changes in the image as possible.] The reconstructed image shows both extended emissions and point sources. It has trouble with point sources inside extended emissions. In this case it cuts off the point source and the peak in image \ref{} is not here.
 
 \textbf{Starlets:} A more sophisticated try at combining both. smallest starlet is larger than the antenna beam width.
+
 
 
 
