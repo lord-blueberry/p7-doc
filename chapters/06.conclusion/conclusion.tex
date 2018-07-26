@@ -1,14 +1,10 @@
-\section{Future Compressed Sensing Reconstruction}
+\section{Future in Compressed Sensing Reconstruction}
 The flexibility of Compressed Sensing Reconstructions allows us to change the prior according to our previous knowledge, all while keeping the same objective and optimization algorithm. The prior can be updated as our knowledge changes. It was able to find plausible structures smaller than the antenna beam-width. Using Compressed Sensing Reconstructions gives us theoretical guarantees that,  if our prior models the observation well enough, we reconstruct the true image from under-sampled measurements.
 
 %There are many possible combinations of prior, optimization algorithm and objective. So far, no optimal combination has been found. 
 
-A proof of Compressed Sensing Reconstruction was implemented in CASA as a deconvolver. It takes the dirty image and point spread function as input and calculates the optimal deconvolution according to the objective. The current implementation has a quadratic memory requirement. It does not scale to any pracical image size for VLA observations. New interferometers like MeerKAT will require even larger images. The current implementation is not suited for large scale reconstructions. 
+A proof of Compressed Sensing Reconstruction was implemented in CASA as a minor cycle deconvolver. It takes the dirty image and point spread function as input and calculates the optimal deconvolution according to the objective. The current implementation has a quadratic memory requirement. It does not scale to any practical image size for VLA observations. New interferometers like MeerKAT will require even larger images. The current implementation is not suited for large scale reconstructions. 
 
-New interferometers are built with wide field of view observations in mind:
-and does not handle the effects of wide field of view observations.  New interferometers like MeerKAT will require an even higher amount of pixels. The data amount will scale up by several factors compared to VLA and require scalable image reconstruction. Futhermore, they are built with wide field of view imaging in mind. 
+Self-calibration is a task which was not covered in this project. Self-calibration aims to reconstruct both the image and the the antenna gain calibration from the same measurements. Here with Compressed Sensing Reconstructions one may be able to apply complex optimization techniques to self-calibration, and find the global optimum of both calibration and reconstructed image.
 
-Calibration for these instruments get more complicated. Compressed Sensing Reconstructions are flexible enough and can potentially improve self-calibration tasks.
-
-The next step is to add the effects of wide field of view imaging and see how they scale.
-
+New interferometers are built with wide field of view imaging in mind, which introduces new measurement effects that a reconstruction algorithm should account for. State of the art Compressed Sensing Reconstructions take the measurements as input and also correct wide field of view effects. Due to the CASA interface, the current implementation is restricted to be in the image space, the effects of wide field of view are currently handled by CASA. The next step is a Compressed Sensing Reconstruction which accounts for the effects of wide field imaging and scales to astronomical image sizes.
