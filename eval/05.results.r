@@ -117,7 +117,7 @@ plotline <- function(mod.list, files1, files2) {
   for (file in files1) {
     d = data.matrix(mod.list[[file]])
     print(file)
-    line <- calcline(d, p0, p1, interpolation.length)
+    line <- rev(calcline(d, p0, p1, interpolation.length))
     start <- i1 + 1
     stop <- i1 + interpolation.length
     df1$index[start:stop] = 1:interpolation.length
@@ -132,7 +132,7 @@ plotline <- function(mod.list, files1, files2) {
   for (file in files2) {
     print(file)
     d = data.matrix(mod.list[[file]])
-    line <- calcline(d, p0, p1, interpolation.length)
+    line <- rev(calcline(d, p0, p1, interpolation.length))
     start <- i2 + 1
     stop <- i2 +interpolation.length
     df2$index[start:stop] = 1:interpolation.length
@@ -140,7 +140,9 @@ plotline <- function(mod.list, files1, files2) {
     df2$image[start:stop] = file
     i2 = i2 + interpolation.length
   }
-  
+  rowNames <- calcRowLine(data.matrix(mod.list[[1]]), p0,p1, interpolation.length)
+  df1$index <- rev(rep(rowNames,length(files1)))
+  df2$index <- rev(rep(rowNames,length(files2)))
   print(ggplot(data = df1, aes(x=df1$index, y=df1$value, colour=df1$image)) + geom_line())
   print(ggplot(data = df2, aes(x=df2$index, y=df2$value, colour=df2$image)) + geom_line())
 }
@@ -199,14 +201,18 @@ mod.list[["clean_model"]] <- diff
 mod.list[["raw_model"]] <- data.matrix(img.list[["raw_image"]])
 
 #writePNGs(img.list, img.names, 300)
-writePNGs(res.list,res.names, 300)
+#writePNGs(res.list,res.names, 300)
 writePNGs(mod.list,mod.names, 200)
 
 files1 <- c("raw_model", "clean_model", "positive_deconv_model" ,"L1_model", "L2_model")
-files2 <- c( "clean_model", "L2_model","TV_model", "starlets3_model")
+files2 <- c( "clean_model", "L1+L2_model","TV_model", "starlets3_model")
 #writeExport(mod.list, files1, files2)
 
 library(ggplot2)
 library(scales)
 
 plotline(mod.list,files1, files2)
+
+files1 <- c("raw_image", "clean_image", "positive_deconv_image", "L1_image", "L2_image")
+files2 <- c( "clean_image", "L1+L2_image","TV_image", "starlets3_image")
+plotline(img.list,files1, files2)
