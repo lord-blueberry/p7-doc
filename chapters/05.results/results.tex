@@ -149,5 +149,5 @@ CLEAN produces the most accurate flux for strong point sources, even though in o
 
 In this example, the L1 normalization was able to find smaller, plausible structures than CLEAN inside the remnant. Outside the remnant, all Compressed Sensing Reconstructions found "fake" extended emissions. The L2 and starlet were also expected to find smaller structures. One possible explanation is that the antenna beam-width is about two pixels wide. Any structure smaller than the beam-width is one pixel wide.
 
-For higher resolutions it is expected that L1 introduces more artefacts. The current implementation cannot increase the resolution since it needs a quadratic amount of memory per pixel: The image size of about $128*128$ was the maximum which was feasible to solve on a laptop. The convolution operation $x \star PSF$ gets modelled as a matrix-vector product. The matrix therefore has $128*128$ rows and columns.
+For higher resolutions it is expected that L1 introduces more artefacts. The current implementation cannot increase the resolution since it needs a quadratic amount of memory per pixel: The image size of about $128^2$ was the maximum which was feasible to solve on a laptop. The convolution operation $x \star PSF$ gets modelled as a matrix-vector product. The matrix therefore has $128^4$ entries.
 

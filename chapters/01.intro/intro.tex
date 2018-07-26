@@ -97,13 +97,9 @@ The L0 "norm" makes this problem for non-convex: It may  it is in NP-Hard. There
 
 but CLEAN does not minimize to an optima, it stops early. Hard to analyse how close the current solution is to the true minimum.
 
-CLEAN works well when the observed image is indeed contains only point sources. However, the new interferometers have more complex observations, extended emissions. CLEAN regularization scheme is a fixed part of the algorithm. 
+%beam-width
 
-%Since the original problem is ill-posed, the objective \eqref{intro:eq:clean} may have several zero points. In practice, CLEAN is stopped before it reaches zero. The addition of noise can add spurious peaks in the dirty image. By stopping early, CLEAN regularizes the objective. It assumes only a limited number of point sources exist in the image. The larger the magnitude of the peak, the more likely it is to be a real point source.
-
-%In short, CLEAN does a greedy approximation of the deconvolution problem, and assumes the resulting image consists out of a few point sources. The question remains, how close the CLEAN approximation is to the true image? If the true image consists out of a few point sources, CLEAN produces a good approximation. Extended emissions however are harder for CLEAN to reproduce. The peak of extended sources is lower than that of point sources. It is harder for CLEAN to distinguish extended sources from noise.
-
-T%he CLEAN regularization scheme is not ideal for extended sources. Ideally another way of regularization would be chosen for extended emissions, but the regularization is a fixed part of the CLEAN algorithm.
+CLEAN does a greedy approximation of the deconvolution problem, and assumes the resulting image consists out of a few point sources. The question remains, how close the CLEAN approximation is to the true image? If the true image consists out of a few point sources, CLEAN produces a good approximation. Extended emissions however get approximated by a large number of faint point sources. The peak of extended emissions are generally lower than of point sources. CLEAN has more trouble distinguishing extended sources from noise. Future interferometers like MeerKAT will become more sensitive to fainter sources. The reconstruction task for new instruments may contain more faint and extended sources. Ideally, we would modify the regularization of CLEAN and explicitly model the new effects. Sadly, the regularization is a fixed part of the CLEAN algorithm.
 
 
 \subsection{The Compressed Sensing Framework for Image Reconstruction}

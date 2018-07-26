@@ -1,10 +1,12 @@
 \section{Future Compressed Sensing Reconstruction}
-The flexibility of Compressed Sensing Reconstructions allows us to change the prior according to our prior knowledge of the observation. 
-Compressed Sensing Reconstructions allow the exchange of priors. New prior knowledge can be incorporated without changing the underlying objective or the optimization algorithm.
+The flexibility of Compressed Sensing Reconstructions allows us to change the prior according to our previous knowledge, all while keeping the same objective and optimization algorithm. The prior can be updated as our knowledge changes. It was able to find plausible structures smaller than the antenna beam-width. Using Compressed Sensing Reconstructions gives us theoretical guarantees that,  if our prior models the observation well enough, we reconstruct the true image from under-sampled measurements.
 
-Flexibility allows multiple ways to solve the same problem. Optimal solution does not exist yet. 
+%There are many possible combinations of prior, optimization algorithm and objective. So far, no optimal combination has been found. 
 
-A proof of Compressed Sensing Reconstruction was implemented in CASA as a deconvolver. It was shown that with Compressed Sensing, one is potentially able to super-resolve sources. However, the current implementation has a quadratic memory requirement, it does not scale to image sizes which are used in practice. New interferometers like MeerKAT will require an even higher amount of pixels. The data amount will scale up by several factors compared to VLA and require scalable image reconstruction. Futhermore, they are built with wide field of view imaging in mind. 
+A proof of Compressed Sensing Reconstruction was implemented in CASA as a deconvolver. It takes the dirty image and point spread function as input and calculates the optimal deconvolution according to the objective. The current implementation has a quadratic memory requirement. It does not scale to any pracical image size for VLA observations. New interferometers like MeerKAT will require even larger images. The current implementation is not suited for large scale reconstructions. 
+
+New interferometers are built with wide field of view observations in mind:
+and does not handle the effects of wide field of view observations.  New interferometers like MeerKAT will require an even higher amount of pixels. The data amount will scale up by several factors compared to VLA and require scalable image reconstruction. Futhermore, they are built with wide field of view imaging in mind. 
 
 Calibration for these instruments get more complicated. Compressed Sensing Reconstructions are flexible enough and can potentially improve self-calibration tasks.
 
