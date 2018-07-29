@@ -31,7 +31,7 @@ In the Compressed Sensing Reconstruction we want to find our $x$ in a noisy envi
 
 Reconstructing an image from measurements is related to lossy image compression. Indeed, we know our image can be compressed in a dictionary $D$, the same $D$ works well for reconstruction: For example images depicting nature scenes are sparse in the wavelet domain. If $x$ in \eqref{cs:eq:sparseDic} are nature scenes, we can create a Dictionary $D$ of wavelets. A single image $x$ can be represented with a few wavelets, meaning the number of non-zero entries $s$ in $\alpha$ is far lower than the number of pixels $n$. All that is left to do for compression is save the non-zero entries of $\alpha$. In the noisy environment, we save the $s$ largest elements of $\alpha$ and save a de-noised image.
 
-Find a Dictionary $D$ in which radio can be seen as finding a compression space.
+Find a dictionary $D$ in which radio can be seen as finding a compression space.
 
 
 Finding the right sparseland prior is a modelling task. It codes our prior knowledge about radio sources and what they might produce. Sparseland priors are in use by for example with Starlets\cite{starck2015starlet} and Curvelets\cite{starck2003astronomical}. 

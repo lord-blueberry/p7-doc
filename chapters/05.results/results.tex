@@ -112,22 +112,16 @@ Two figures compare the Dirty Image, CLEAN and the Compressed Sensing Reconstrut
 
 \begin{figure}
 	\centering
-
-	\caption{profile cut}
-\end{figure}
-
-\begin{figure}
-	\centering
-	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth, trim={180px 170px 170px 146px}, clip]{./chapters/05.results/pic_G55_7_lined.png}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.3\linewidth}
-		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/05.results/raw_image_lined.png}
+	\begin{subfigure}[b]{0.9\linewidth}
+		\centering
+		\includegraphics[width=0.3\linewidth, trim={180px 170px 170px 146px}, clip]{./chapters/05.results/pic_G55_7_lined.png}
+		\includegraphics[width=0.3\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/05.results/raw_image_lined.png}
+		\caption{profile cut}
 	\end{subfigure}
 
-	\includegraphics[width=\linewidth, clip]{./chapters/05.results/tmp0.png}
-	\includegraphics[width=\linewidth, clip]{./chapters/05.results/tmp1.png}
-	\caption{Intensity profile of CLEAN and the different Compressed Sensing priors.}
+	\includegraphics[width=\linewidth, clip]{./chapters/05.results/df1.png}
+	\includegraphics[width=\linewidth, clip]{./chapters/05.results/df2.png}
+	\caption{Intensity profile of CLEAN and the different Compressed Sensing Regularizations.}
 	\label{res:g55:profile}
 \end{figure}
 
@@ -137,7 +131,7 @@ Two figures compare the Dirty Image, CLEAN and the Compressed Sensing Reconstrut
 
 \textbf{L1:} There is almost no visible difference between no regularization and L1. This is possibly an interaction with the Miller $\lambda$ estimation, since the result of no regularization was used to estimate the $\lambda$ of L1. The L1 regularization removes part of the "fake" extended emission, particularly in the top region, but also a few structures in the center. The peaks in the profile \ref{res:g55:profile} of L1 and no regularization are narrower than CLEAN, although they do not reach the same peak flux. L1 is prone to produce unlikely extended emissions: L1 also tries to approximate extended emissions with a number of faint point sources. This can introduce artefacts like pixel wide holes in extended emissions.
 
-\textbf{L2:} Forces the extended emissions to be more smoooth. It also considerably lowers the flux of bright point sources. The profile \ref{res:g55:profile} shows L2 forces the bright peak to widen and lower. The peak is almost as wide as the CLEAN reconstruction. In the remnant center, it smoothers the smaller peaks.
+\textbf{L2:} Forces the extended emissions to be more smooth. It also considerably lowers the flux of bright point sources. The profile \ref{res:g55:profile} shows L2 forces the bright peak to widen and lower. The peak is almost as wide as the CLEAN reconstruction. In the remnant center, it smoothers the smaller peaks.
 
 \textbf{L1+L2}: Since L1 does a good job with point sources, but needs to be more continuous for extended emissions, why does one not combine both regularizations? The flexibility of Compressed Sensing Reconstructions allows for it. Sadly, the result is indistinguishable from the L1 regularization. In the dirty image, all pixels are very close to zero (Maximum: 0.0076 in Dirty Image). If the L1 and L2 regularization receive the same $\lambda$, the L1 term dominates. If the dirty image would contain pixels much larger than 1, then the L2 term would dominate.
 

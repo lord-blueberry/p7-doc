@@ -105,7 +105,7 @@ calcRowLine <- function(matrix, p0,p1,length.out=100) {
 }
 
 
-plotline <- function(mod.list, files1, files2) {
+plotline <- function(mod.list, files1, files2, outfolder) {
   p0 <- c(92,29)
   #p1 <- c(29,85)
   p1 <- c(46,59)
@@ -115,36 +115,84 @@ plotline <- function(mod.list, files1, files2) {
   colnames(df1) <- c("index", "value","image")
   i1 <- 0
   for (file in files1) {
-    d = data.matrix(mod.list[[file]])
     print(file)
+    name <- gsub("_model","",file)
+    if(name =="raw") {
+      name = "Dirty"
+    }
+    if(name =="positive_deconv") {
+      name="No Regularization"
+    }
+    if(name =="clean") {
+      name = "CLEAN"
+    }
+    d = data.matrix(mod.list[[file]])
     line <- rev(calcline(d, p0, p1, interpolation.length))
     start <- i1 + 1
     stop <- i1 + interpolation.length
     df1$index[start:stop] = 1:interpolation.length
     df1$value[start:stop] = line
-    df1$image[start:stop] = file
+    df1$image[start:stop] = name
     i1 = i1 + interpolation.length
   }
   print("")
+  
   df2 <- data.frame(matrix(ncol=3, nrow=length(files2)*interpolation.length))
   colnames(df2) <- c("index", "value","image")
   i2 <- 0
   for (file in files2) {
     print(file)
+    name <- gsub("_model","",file)
+    if(name =="clean") {
+      name = "CLEAN"
+    }
+    if(name =="starlets3") {
+      name = "Starlets"
+    }
     d = data.matrix(mod.list[[file]])
     line <- rev(calcline(d, p0, p1, interpolation.length))
     start <- i2 + 1
     stop <- i2 +interpolation.length
     df2$index[start:stop] = 1:interpolation.length
     df2$value[start:stop] = line
-    df2$image[start:stop] = file
+    df2$image[start:stop] = name
     i2 = i2 + interpolation.length
   }
   rowNames <- calcRowLine(data.matrix(mod.list[[1]]), p0,p1, interpolation.length)
   df1$index <- rev(rep(rowNames,length(files1)))
   df2$index <- rev(rep(rowNames,length(files2)))
-  print(ggplot(data = df1, aes(x=df1$index, y=df1$value, colour=df1$image)) + geom_line())
-  print(ggplot(data = df2, aes(x=df2$index, y=df2$value, colour=df2$image)) + geom_line())
+  df1$image <- factor(df1$image, levels = unique(df1$image), ordered=TRUE)
+  df2$image <- factor(df2$image, levels = unique(df2$image), ordered=TRUE)
+  png(paste(outfolder,"df1", ".png",sep=""),
+      width = 12.0,
+      height = 6.0,
+      units = "in",
+      res = 200)
+  print(ggplot(data = df1, aes(x=df1$index, y=df1$value, colour=df1$image)) + geom_line()
+        + xlab("arcseconds")
+        + ylab("Jansky/beam")
+        + labs(colour='Image:')
+        + scale_colour_brewer(palette = "Dark2")
+        + theme(legend.position="top",
+                legend.text=element_text(size=11), 
+                legend.title=element_text(size=13))
+        )
+  dev.off()
+  png(paste(outfolder,"df2", ".png",sep=""),
+      width = 12.0,
+      height = 6.0,
+      units = "in",
+      res = 200)
+  print(ggplot(data = df2, aes(x=df2$index, y=df2$value, colour=df2$image)) + geom_line()
+        + xlab("arcseconds")
+        + ylab("Jansky/beam")
+        + labs(colour='Image:')
+        + scale_colour_brewer(palette = "Dark2")
+        + theme(legend.position="bottom",
+                legend.text=element_text(size=12), 
+                legend.title=element_text(size=13))
+        )
+  dev.off()
 }
 
 
@@ -211,7 +259,7 @@ files2 <- c( "clean_model", "L1+L2_model","TV_model", "starlets3_model")
 library(ggplot2)
 library(scales)
 
-plotline(mod.list,files1, files2)
+plotline(mod.list, files1, files2,"../chapters/05.results/")
 
 files1 <- c("raw_image", "clean_image", "positive_deconv_image", "L1_image", "L2_image")
 files2 <- c( "clean_image", "L1+L2_image","TV_image", "starlets3_image")
