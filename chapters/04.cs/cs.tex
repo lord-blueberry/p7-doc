@@ -122,7 +122,7 @@ The first major cycle iteration creates the PSF and the dirty image. Then, sever
 
 In CASA the major cycle is fixed. It was evaluated if it can be modified, but a modification was too time consuming in the context of the project. However CASA allows for the addition of new deconvolution algorithms. 
 
-Compressed Sensing Algorithm was implemented as a CASA deconvolver. The Data term of the objective is fixed to be the deconvolution ($D_{dirty} x \star PSf$). 
+Compressed Sensing Algorithm was implemented as a CASA deconvolver. The Data term of the objective is fixed to be the deconvolution ($D_{dirty} x - \star PSF$). 
 
 
 Major cycle is more expensive to compute than a CLEAN minor cylce. 

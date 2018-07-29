@@ -1,37 +1,36 @@
 \section{Reconstruction from under-sampled Measurements}\label{intro}
-In nature, we encounter continuous signals: Music, pictures,  Computers can only measure discrete samples. How many samples are needed to capture a signal?
+In Signal Processing, continuous signals are represented with discrete samples. A digital recording of music, an image of a tree, or the measured velocity of a particle, all are discrete samples of continuous signals. The Nyquist-Shannon sampling rate tells us how many samples are needed to fully represent a signal: A signal which contains at most frequency $f$ should be sampled with a frequency higher than $2f$. For example if we record a piece of music where the highest tone is at 20kHz, sampling rate should be more than 40kHz. Then, the music piece gets recorded above the Nyquist-Shannon sampling rate. It is fully sampled and there is exactly one continuous signal(with maximum frequency $f$) which fits the measurement.
 
-We want to convert a continuous signal into discrete samples: A music piece, an image of a tree. How many samples are needed to guarantee we know everything about the signal. Nyquist-Shannon Sampling Theorem: The sampling rate needs to be more than twice the highest frequency of the signal. Recording music, we the highest tone of the piece is 20kHz, our sampling rate should be more than 40kHz. Then our measurements guarantee to capture the continuous time signal.
+The Nyquist-Shannon sampling rate is not always achievable: Samples may be expensive to acquire, corrupted by noise, or incomplete by the nature of the measurement instrument. In this case we are dealing with under-sampled measurements. Many possible signals fit the measurement and from the measurement alone, we cannot distinguish the true signal from all possibilities.
 
-Unique signal
+With the Theory of Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} however, we can use prior information about the signal and find the most likely candidate from all possibilities. Under the right conditions, the most likely candidate is guaranteed to be the true signal. With the Theory of Compressed Sensing, we exploit prior information to reconstruct the true signal from under-sampled measurements.
 
-However the Nyquist-Shannon Sampling Rate is not always achievable. Fully sampling is expensive, samples get corrupted, or the instrument itself. In these cases we deal with under-sampled measurements: Many possible signals fit the measurements, we want to find the true signal from.
+In this project, the Theory of Compressed Sensing gets applied to the image reconstruction problem of interferometers.
 
-The Theory of Compressed Sensing is a recent Sampling Theorem. We can find the true signal from under-sampled measurements by using our prior knowledge about the signal. Different Applications like compression, de-noising and in-painting.
-
-In this project, the Theory of Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} is applied to Image Reconstruction from under-sampled measurements. in the field of radio interferometers.
+In this project, a proof of concept Compressed Sensing reconstruction algorithm was developed and implemented in the Common Astronomy Software Application(CASA). Performance was compared to CLEAN and on VLA measurements of the G55 Supernova Remnant.
 
 
 \subsection{Image Reconstruction for Radio Interferometers}
 Measure arrival time differences of photons.
 
 In small field of view, it each antenna pair measures approximately a Fourier Component. Phase and Amplitude. measurements. 
+
 Only small field of view gets discussed here.
+
 It is called Visibility
 
 If the interferometer would fully sample the Fourier space, the inverse Fourier Transform would produce the image. Since it is under-sampled, the image can be calculated, but is "dirty", corrupted by the instrument. The task is to reconstruct the true image from under-sampled Fourier measurements.
 
-CLEAN class of algorithms reconstructs the image from under-sampled measurements.
 
-The CLEAN class of algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are used to reconstruct the image and is the de-factor standard. Fixed prior assumption about the image.
+The CLEAN class of algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are used to reconstruct the image and is the de-factor standard. The prior is a fixed part of the algorithm. Fixed prior about the image.
 
 New instruments like SKA produce new effects. As our knowledge of radio images changes, we want to change the prior of the reconstruction algorithm.
 
+Compressed Sensing is a generalization of CLEAN, prior can be exchanged.
 With compressed Sensing, A reconstruction algorithm that can change the prior according to what we know.
 
 Antenna beam pattern. Possible super resolution: Structures smaller than the beam size of the antennas.
 
-In this project, a proof of concept Compressed Sensing reconstruction algorithm was developed and implemented in the Common Astronomy Software Application(CASA). Performance was compared to CLEAN and on VLA measurements of the G55 Supernova Remnant.
 
 
 %The angular resolution of a radio antenna is proportional to the wavelength divided by the dish diameter. To achieve high angular resolution the diameter should be as large as possible. But real world limitations like steering accuracy and price limit the diameter. Currently the largest single dish antenna has a diameter of about 500 meters\cite{chinaFAST}. 
@@ -128,12 +127,12 @@ The L0 "norm" makes this problem for non-convex: It may  it is in NP-Hard. There
 
 but CLEAN does not minimize to an optima, it stops early. Hard to analyse how close the current solution is to the true minimum.
 
-%beam-width
+Convolution with antenna beam-pattern.
 
 CLEAN does a greedy approximation of the deconvolution problem, and assumes the resulting image consists out of a few point sources. The question remains, how close the CLEAN approximation is to the true image? If the true image consists out of a few point sources, CLEAN produces a good approximation. Extended emissions however get approximated by a large number of faint point sources. The peak of extended emissions are generally lower than of point sources. CLEAN has more trouble distinguishing extended sources from noise. Future interferometers like MeerKAT will become more sensitive to fainter sources. The reconstruction task for new instruments may contain more faint and extended sources. Ideally, we would modify the regularization of CLEAN and explicitly model the new effects. Sadly, the regularization is a fixed part of the CLEAN algorithm.
 
 
-\subsection{The Compressed Sensing Framework for Image Reconstruction}
+\subsection{CLEAN as Compressed Sensing Image Reconstruction}
 An image reconstruction algorithm in the Compressed Sensing Framework consists of three parts:
 
 \begin{itemize}
