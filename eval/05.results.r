@@ -173,7 +173,7 @@ plotline <- function(mod.list, files1, files2, outfolder) {
         + ylab("Jansky/beam")
         + labs(colour='Image:')
         + scale_colour_brewer(palette = "Dark2")
-        + theme(legend.position="top",
+        + theme(legend.position="bottom",
                 legend.text=element_text(size=11), 
                 legend.title=element_text(size=13))
         )

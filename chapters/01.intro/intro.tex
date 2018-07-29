@@ -5,7 +5,8 @@ The Nyquist-Shannon sampling rate is not always achievable: Samples may be expen
 
 With the Theory of Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} however, we can use prior information about the signal and find the most likely candidate from all possibilities. Under the right conditions, the most likely candidate is guaranteed to be the true signal. With the Theory of Compressed Sensing, we exploit prior information to reconstruct the true signal from under-sampled measurements.
 
-In this project, the Theory of Compressed Sensing gets applied to the image reconstruction problem of interferometers.
+
+In this project, the Theory of Compressed Sensing was applied to Radio Astronomy. the Theory of Compressed Sensing was applied to reconstruct under-sampled image in radio astronomy. in radio interferometers. applied to the image reconstruction problem of interferometers.
 
 In this project, a proof of concept Compressed Sensing reconstruction algorithm was developed and implemented in the Common Astronomy Software Application(CASA). Performance was compared to CLEAN and on VLA measurements of the G55 Supernova Remnant.
 
@@ -44,38 +45,21 @@ Antenna beam pattern. Possible super resolution: Structures smaller than the bea
 %New Interferometers on the horizon with SKA. To improve reconstruction, we would like to model our prior knowledge about the. New observations new effects. CLEAN has a rigid assumption about what the reconstructed image should look like. It cannot be adapted as our knowledge of the universe changes.
 
 %The Theory of Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} has seen success in solving ill-posed inverse problems. 
-%It is flexible in its application and can be used in de-noising\cite{many}, in-painting\cite{many} and super-resolution\cite{many}.
 
 
 \subsection{Deconvolution of the Dirty Image}
-A way of modelling the reconstruction problem is in form of a deconvolution. The inverse Fourier Transform computes an image, but the image is "dirty", corrupted by effects of under-sampling, beam patterns of the antennas etc.
-
-Fourier Transform produces the dirty image $I_{dirty}$. It is modified by instrumental effects from under-sampling and antenna beam-pattern. The instrumental effects can be modelled
-
-If the interferometer could sample all Visibilities, then the Fourier Transform would produce the observed image. However, since there are a limited number of antenna pairs, we  measure the same limited number of Visibilities. The measurement is under-sampled and the image of the Fourier Transform is "dirty". The undersampling convolves the observed image with a point spread function(PSF). The task is to deconvolve the image and remove the effects of undersampling \eqref{intro:eq:deconvolve}.
+The ideal interferometer would fully sample the Fourier Space and introduce no instrumental effects. The observed image can then be retrieved by the inverse Fourier Transform. A real world interferometer corrupts the observed image with the image with under-sampling, the antenna beam-pattern and other instrumental effects. The inverse Fourier Transform of the Visibilities can still be calculated, but it results in a corrupted, "dirty" image. The real world interferometer convolves the true image with a Point Spread Function(PSF), which results in the "dirty" image. The task is to deconvolve the "dirty" image with the PSF and retrieve the true image. More formally, we try to find a solution $x$ for equation \eqref{intro:eq:deconvolve}, where only the $PSF$ and $I_{dirty}$ are known.
 
 \begin{equation}\label{intro:eq:deconvolve}
 x \star  PSF + N = I_{dirty} 
 \end{equation}
 
-the PSF models the instrumental effects of undersampling, antenna beam patterns.
-The point spread function models the instrument effects. The task is now to deconvolve the image in a noisy environment.  .
+PSF models the instrumental effects. A different instrument olny changes the PSF\footnote{This is of course only true for small field of view imaging. Wide field of view imaging introduces more complex instrumental effects.} can be estimated
 
-Equation \eqref{intro:eq:deconvolve} is an ill posed problem::
-\begin{itemize}
-	\item It is unknown if a solution exists
-	\item There may be many solutions
-	\item a small change in the measurement may lead to very different solutions 
-\end{itemize}
+CASA produces a the $I_{dirty}$ image and the PSF for the VLA instrument.
 
+Note that the Formulation as a deconvolution is a valid way to solve the reconstruction problem, but it is not the only one. It was used since CASA interface is built for deconvolution algorithms. For example, it can be formulated as an in-painting problem, where only the measured Visibilities are known and the task is to find the missing Visibilities. In \ref{cs:objective} we discuss the possibilities in more details.
 
-
-CASA produces a the $I_{dirty}$ image and the PSF.
-
-
-%Each antenna pair measures a complex Visibility of the sky brightness. The distance between the antennas, the baseline, dictates the sample point in the Fourier Space (called UV-Space). Longer baselines sample higher frequency components, while shorter baselines sample lower frequency components. 
-
-%For small Field of View imaging, the measured Visibilities equal two dimensional Fourier components. The observed image can be calculated by the two dimensional Inverse Fourier Transform. However the interferometer cannot sample the whole UV-Space. The image calculated by the Inverse Fourier Transform is 'dirty', it contains artefacts introduced by undersampling. 
 
 \begin{figure}[h!]
 	\centering
@@ -106,17 +90,17 @@ CASA produces a the $I_{dirty}$ image and the PSF.
 
 %The Inverse Problem is now to remove the artefacts of the interferometer and retrieve the true image. The effects of the undersampling can be modeled by a Point Spread Function (PSF). The interferometer sees the true image of the sky, but due to undersampling it gets convolved with a PSF, resulting in the dirty image.  More formally, we try to find a solution $x$ for equation \eqref{intro:eq:deconvolve}, where only the PSF and $I_{dirty}$ are known. This problem is ill-posed: it may have multiple solutions, and a small change in the $I_{dirty}$ or the PSF may result in large changes in $x$. Furthermore, the whole problem gets corrupted by noise.
 
-%The PSF is surprisingly easy to calculate. The Fourier Transformed PSF equals the sampling pattern in UV-Space. Remember that a convolution in image space is a multiplication in Fourier. The effects of under-sampling in image space are a convolution with the PSF. In the Fourier space it is masking all components other than the measured ones. From the Antenna Configuration we can infer the masking matrix $M$ in UV-Space. Calculating the Inverse Fourier Transform of $M$ results in the PSF.
-
 
 \subsection{Approximation with CLEAN}
 The prior of CLEAN
 
 Fixed in the algorithm
-%CLEAN assumes the observed image contains several bright point sources. In each iteration of CLEAN, it searches the highest peak of the dirty image and removes a fraction of the PSF. It stops until the next highest peak is below a threshold, or if the maximum number of iterations was reached. The fraction of the PSF, threshold and number of iterations are all tunable by the user.
+%CLEAN assumes the observed image contains several bright point sources. 
+
+In each iteration of CLEAN, it searches the highest peak of the dirty image and removes a fraction of the PSF. It stops until the next highest peak is below a threshold, or if the maximum number of iterations was reached. The fraction of the PSF, threshold and number of iterations are all tunable by the user.
 
 It works as an approximation of the original problem. It greedily minimizes the objective \eqref{intro:eq:clean}. 
-Note that the L0 norm\footnote{This is a common abuse of notation in Compressed Sensing literature: The "L0 norm" is not a norm.} acts as the indicator\footnote{For the L0 norm to work we need to define $0^0 = 0$} function.
+Note that the L0 "norm"\footnote{The L0 "norm" in this context is technically not a norm, hence the quotation marks. The L0 "norm" is a common notation in Compressed Sensing literature, therefore it is used here.} sum of non-zero elements in the image.
 
 \begin{equation}\label{intro:eq:clean}
 \underset{x}{minimize} \: \left \| I_{dirty} - x \star PSF \right \|_2^2 + \: \left \| x \right \|_0
