@@ -9,28 +9,27 @@ In this project, the Theory of Compressed Sensing was applied to an image recons
 
 
 \subsection{Image Reconstruction for Radio Interferometers}
-Radio Interferometers use several antennas spaced apart from each other. Each antenna pair measures the different arrival time of a radio wave. For small field of view imaging, each antenna pair measures approximately two dimensional Fourier components of the sky(called Visibility in Astronomy). An interferometer with 26 antennas measures 325 Visibilities. The distance between the antenna pair(called a baseline) dictates which Visibility of the image gets observed. The longer the baseline, the higher frequency of the observed Visibility. The longest baseline of an interferometer is therefore a rough estimate of its maximum resolution.
+Radio Interferometers use several antennas spaced apart from each other. Each antenna pair measures the different arrival time of a radio wave. For small field of view imaging, each antenna pair measures approximately two dimensional Fourier components of the sky (called Visibility in Astronomy). An interferometer with 26 antennas measures 325 Visibilities. The distance between the antenna pair(called a baseline) dictates which Visibility of the image gets observed. The longer the baseline, the higher frequency of the observed Visibility. The longest baseline of an interferometer is therefore a rough estimate of its maximum resolution.
 
 For wide field of view imaging, the two dimensional Fourier relation breaks apart as additional effects dominate the measurement. This project used small field of view imaging, and the two dimensional Fourier component is a good approximation. In this document, a measured Visibilitiy equals a two dimensional Fourier component.
 
-The interferometer only samples as many Visibilities as it has antenna pairs. The task is to reconstruct the observed image from an under-sampled Fourier space. In Astronomy, the CLEAN class of algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} were developed for this task. It uses a fixed prior to reconstruct the image and has produced remarkable results in the past.
+The interferometer only samples as many Visibilities as it has antenna pairs. The task is to reconstruct the observed image from an under-sampled Fourier space. In Astronomy, the CLEAN class of algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} were developed for this task. New interferometers like MeerKAT also observe new phenomenons which, in an ideal world, can be included in the CLEAN prior and improve its reconstruction. This is not possible in CLEAN, the prior is a fixed part of the algorithm. It cannot be modified as our prior knowledge of radio images increases.
 
-New interferometers like MeerKAT observe new phenomenons. To improve the image reconstruction, one would want to modify and add to the prior of CLEAN as  and model
-
+Compressed Sensing can be thought of as a generalization of the CLEAN algorithm. The prior can be exchanged without changing the rest of the reconstruction algorithm. Furthermore Compressed Sensing reconstructions may be able to find structures smaller than the antenna beam-pattern\cite{girard2015sparse}.
 
 Antenna beam pattern. Possible super resolution: Structures smaller than the beam size of the antennas.
 
 
 \subsection{Deconvolution of the Dirty Image}
-The ideal interferometer would fully sample the Fourier Space and introduce no instrumental effects. The observed image can then be retrieved by the inverse Fourier Transform. A real world interferometer corrupts the observed image with the image with under-sampling, the antenna beam-pattern and other instrumental effects. The inverse Fourier Transform of the Visibilities can still be calculated, but it results in a corrupted, "dirty" image. The real world interferometer convolves the true image with a Point Spread Function(PSF), which results in the "dirty" image. The task is to deconvolve the "dirty" image with the PSF and retrieve the true image. More formally, we try to find a solution $x$ for equation \eqref{intro:eq:deconvolve}, where only the $PSF$ and $I_{dirty}$ are known.
+The ideal interferometer would fully sample the Fourier Space and introduce no instrumental effects and the observed image can be calculated with the inverse Fourier Transform. A real world interferometer corrupts the observed image with the image with under-sampling, the antenna beam-pattern and other instrumental effects. The inverse Fourier Transform of the Visibilities can still be calculated, but it results in a corrupted "dirty" image. The observed image is convolved with a Point Spread Function (PSF) image with a Point Spread Function(PSF). The task is to reconstruct the observed image from the dirty image and the PSF, or more formally we try to solve for $x$ in equation \eqref{intro:eq:deconvolve}, where only the $PSF$ and $I_{dirty}$ are known($\star$ is used as the convolution operation).
 
 \begin{equation}\label{intro:eq:deconvolve}
 x \star  PSF + N = I_{dirty} 
 \end{equation}
 
-PSF models the instrumental effects. A different instrument olny changes the PSF\footnote{This is of course only true for small field of view imaging. Wide field of view imaging introduces more complex instrumental effects.} can be estimated
+A deconvolution algorithm should find the observed image $x$. However, there may be many possible solutions to the equation \eqref{intro:eq:deconvolve}. Noise $N$ further complicates the deconvolution. The algorithm has to decide what is the most likely $x$ given $PSF$ and $I_{dirty}$. The PSF is specific to the interferometer. It models the sampling pattern in Fourier space, the antenna beam-pattern and more. A deconvolution algorithm is not limited to a single interferometer and can easily be used on other instruments\footnote{This is true for small field of view imaging. Wide field of view introduces additional effects that typically do not get modelled with a PSF}.
 
-CASA produces a the $I_{dirty}$ image and the PSF for the VLA instrument.
+CASA produces a the dirty image and the PSF for the VLA instrument.
 
 Note that the Formulation as a deconvolution is a valid way to solve the reconstruction problem, but it is not the only one. It was used since CASA interface is built for deconvolution algorithms. For example, it can be formulated as an in-painting problem, where only the measured Visibilities are known and the task is to find the missing Visibilities. In \ref{cs:objective} we discuss the possibilities in more details.
 
@@ -61,9 +60,6 @@ Note that the Formulation as a deconvolution is a valid way to solve the reconst
 	\caption{Deconvolution Problem VLA: Retrieve the true image when only PSF and dirty image are known}
 	\label{intro:measurement_problem}
 \end{figure}
-
-%The Inverse Problem is now to remove the artefacts of the interferometer and retrieve the true image. The effects of the undersampling can be modeled by a Point Spread Function (PSF). The interferometer sees the true image of the sky, but due to undersampling it gets convolved with a PSF, resulting in the dirty image.  More formally, we try to find a solution $x$ for equation \eqref{intro:eq:deconvolve}, where only the PSF and $I_{dirty}$ are known. This problem is ill-posed: it may have multiple solutions, and a small change in the $I_{dirty}$ or the PSF may result in large changes in $x$. Furthermore, the whole problem gets corrupted by noise.
-
 
 \subsection{Approximation with CLEAN}
 The prior of CLEAN
