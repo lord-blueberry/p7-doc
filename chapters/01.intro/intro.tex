@@ -5,46 +5,20 @@ The Nyquist-Shannon sampling rate is not always achievable: Samples may be expen
 
 With the Theory of Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} however, we can use prior information about the signal and find the most likely candidate from all possibilities. Under the right conditions, the most likely candidate is guaranteed to be the true signal. With the Theory of Compressed Sensing, we exploit prior information to reconstruct the true signal from under-sampled measurements.
 
-
-In this project, the Theory of Compressed Sensing was applied to Radio Astronomy. the Theory of Compressed Sensing was applied to reconstruct under-sampled image in radio astronomy. in radio interferometers. applied to the image reconstruction problem of interferometers.
-
-In this project, a proof of concept Compressed Sensing reconstruction algorithm was developed and implemented in the Common Astronomy Software Application(CASA). Performance was compared to CLEAN and on VLA measurements of the G55 Supernova Remnant.
+In this project, the Theory of Compressed Sensing was applied to an image reconstruction problem of Radio Astronomy. Interferometers produce under-sampled measurements of the sky which have to be reconstructed by an algorithm. A Compressed Sensing approach was developed and implemented in the Common Astronomy Software Application (CASA). The reconstruction quality was compared to standard reconstruction algorithm in astronomy on VLA data of Supernova Remnant G55.
 
 
 \subsection{Image Reconstruction for Radio Interferometers}
-Measure arrival time differences of photons.
+Radio Interferometers use several antennas spaced apart from each other. Each antenna pair measures the different arrival time of a radio wave. For small field of view imaging, each antenna pair measures approximately two dimensional Fourier components of the sky(called Visibility in Astronomy). An interferometer with 26 antennas measures 325 Visibilities. The distance between the antenna pair(called a baseline) dictates which Visibility of the image gets observed. The longer the baseline, the higher frequency of the observed Visibility. The longest baseline of an interferometer is therefore a rough estimate of its maximum resolution.
 
-In small field of view, it each antenna pair measures approximately a Fourier Component. Phase and Amplitude. measurements. 
+For wide field of view imaging, the two dimensional Fourier relation breaks apart as additional effects dominate the measurement. This project used small field of view imaging, and the two dimensional Fourier component is a good approximation. In this document, a measured Visibilitiy equals a two dimensional Fourier component.
 
-Only small field of view gets discussed here.
+The interferometer only samples as many Visibilities as it has antenna pairs. The task is to reconstruct the observed image from an under-sampled Fourier space. In Astronomy, the CLEAN class of algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} were developed for this task. It uses a fixed prior to reconstruct the image and has produced remarkable results in the past.
 
-It is called Visibility
+New interferometers like MeerKAT observe new phenomenons. To improve the image reconstruction, one would want to modify and add to the prior of CLEAN as  and model
 
-If the interferometer would fully sample the Fourier space, the inverse Fourier Transform would produce the image. Since it is under-sampled, the image can be calculated, but is "dirty", corrupted by the instrument. The task is to reconstruct the true image from under-sampled Fourier measurements.
-
-
-The CLEAN class of algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} are used to reconstruct the image and is the de-factor standard. The prior is a fixed part of the algorithm. Fixed prior about the image.
-
-New instruments like SKA produce new effects. As our knowledge of radio images changes, we want to change the prior of the reconstruction algorithm.
-
-Compressed Sensing is a generalization of CLEAN, prior can be exchanged.
-With compressed Sensing, A reconstruction algorithm that can change the prior according to what we know.
 
 Antenna beam pattern. Possible super resolution: Structures smaller than the beam size of the antennas.
-
-
-
-%The angular resolution of a radio antenna is proportional to the wavelength divided by the dish diameter. To achieve high angular resolution the diameter should be as large as possible. But real world limitations like steering accuracy and price limit the diameter. Currently the largest single dish antenna has a diameter of about 500 meters\cite{chinaFAST}. 
-  
-%Interferometers however, achieve high angular resolutions without the need for huge dish diameters. Several smaller antennas are spaced apart from each other. Together, they act as a single antenna. Interferometers have seen wide use in for radio wavelengths with instruments like VLA and LOFAR.
-
-%Interferometers do not observe the sky directly. The observed image has to be reconstructed from the measurements. The reconstruction is an ill-posed inverse problem. 
-
-%Fixed assumption about the image
-
-%New Interferometers on the horizon with SKA. To improve reconstruction, we would like to model our prior knowledge about the. New observations new effects. CLEAN has a rigid assumption about what the reconstructed image should look like. It cannot be adapted as our knowledge of the universe changes.
-
-%The Theory of Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} has seen success in solving ill-posed inverse problems. 
 
 
 \subsection{Deconvolution of the Dirty Image}
