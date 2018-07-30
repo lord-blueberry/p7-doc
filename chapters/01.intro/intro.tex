@@ -31,7 +31,7 @@ A deconvolution algorithm should find the observed image $x$. However, there may
 
 CASA produces a the dirty image and the PSF for the VLA instrument.
 
-Note that the Formulation as a deconvolution is a valid way to solve the reconstruction problem, but it is not the only one. It was used since CASA interface is built for deconvolution algorithms. For example, it can be formulated as an in-painting problem, where only the measured Visibilities are known and the task is to find the missing Visibilities. In \ref{cs:objective} we discuss the possibilities in more details.
+Note that the deconvolution problem is just one way of formulating the reconstruction. It was used in this project since the CASA interface was built for deconvolution algorithms. The same problem can be formulated as in-painting the missing Visibilities: If we apply the Fourier Transform to equation \eqref{intro:eq:deconvolve}, then the convolution turns to a multiplication and we arrive at a similar equation $X*M + N = V$. The Fourier Transform of $I_{dirty}$ is just the measured Visibilities $V$,  $PSF$ turns into a masking matrix $M$. $M$ is one for all measured Visibilities and zero everywhere else. If an algorithm can in-paint the missing Visibilities $X$, it has also found a solution $x$ to the deconvolution problem of \eqref{intro:eq:deconvolve}. In section \ref{cs:objective} the different formulations get discussed in more detail.
 
 
 \begin{figure}[h!]
@@ -62,21 +62,16 @@ Note that the Formulation as a deconvolution is a valid way to solve the reconst
 \end{figure}
 
 \subsection{Approximation with CLEAN}
-The prior of CLEAN
+CLEAN assumes the image consists of single pixel wide point sources. This is true when the image contains stars, the majority of which are too far away from earth to have any extension. CLEAN therefore takes a dirty image and a PSF as input and tries to find point sources in the image. In each iteration of CLEAN, it searches the highest peak of the dirty image and removes a fraction of the PSF. It stops until the next highest peak is below a threshold, or if the maximum number of iterations was reached. The fraction of the PSF, threshold and number of iterations are tunable by the user.
 
-Fixed in the algorithm
-%CLEAN assumes the observed image contains several bright point sources. 
-
-In each iteration of CLEAN, it searches the highest peak of the dirty image and removes a fraction of the PSF. It stops until the next highest peak is below a threshold, or if the maximum number of iterations was reached. The fraction of the PSF, threshold and number of iterations are all tunable by the user.
-
-It works as an approximation of the original problem. It greedily minimizes the objective \eqref{intro:eq:clean}. 
-Note that the L0 "norm"\footnote{The L0 "norm" in this context is technically not a norm, hence the quotation marks. The L0 "norm" is a common notation in Compressed Sensing literature, therefore it is used here.} sum of non-zero elements in the image.
+CLEAN greedily optimizes the objective \eqref{intro:eq:clean}. Due to the L0 "norm", the objective is non-convex and it may have local minima. Note that the L0 "norm"\footnote{The L0 "norm" in this context is technically not a norm, hence the quotation marks. The L0 "norm" is a common notation in Compressed Sensing literature, therefore it is used here.} acts as the sum of non-zero elements in the image.
 
 \begin{equation}\label{intro:eq:clean}
 \underset{x}{minimize} \: \left \| I_{dirty} - x \star PSF \right \|_2^2 + \: \left \| x \right \|_0
 \end{equation}
 
-Regularization term, minimum, non-convex function (It may have local minima). 
+Good approximation when the observed image contains point sources. However, there are also extended emissions in radio wavelengths like hydrogen clouds.
+
 The L0 "norm" makes this problem for non-convex: It may  it is in NP-Hard. There exist optimizer like Matching Pursuit that approximate the solution well enough for practice.
 
 but CLEAN does not minimize to an optima, it stops early. Hard to analyse how close the current solution is to the true minimum.
