@@ -15,73 +15,46 @@ For wide field of view imaging, the two dimensional Fourier relation breaks apar
 
 The interferometer only samples as many Visibilities as it has antenna pairs. The task is to reconstruct the observed image from an under-sampled Fourier space. In Astronomy, the CLEAN class of algorithms\cite{hogbom1974aperture}\cite{schwab1984relaxing}\cite{rich2008multi}\cite{rau2011multi} were developed for this task. New interferometers like MeerKAT also observe new phenomenons which, in an ideal world, can be included in the CLEAN prior and improve its reconstruction. This is not possible in CLEAN, the prior is a fixed part of the algorithm. It cannot be modified as our prior knowledge of radio images increases.
 
-Compressed Sensing can be thought of as a generalization of the CLEAN algorithm. The prior can be exchanged without changing the rest of the reconstruction algorithm. Furthermore Compressed Sensing reconstructions may be able to find structures smaller than the antenna beam-pattern\cite{girard2015sparse}.
+Compressed Sensing can be thought of as a generalization of the CLEAN algorithm. The prior can be exchanged without changing the rest of the reconstruction algorithm. Furthermore Compressed Sensing reconstructions may be able to super-resolve the image\cite{girard2015sparse}.
 
-Antenna beam pattern. Possible super resolution: Structures smaller than the beam size of the antennas.
 
 
 \subsection{Deconvolution of the Dirty Image}
-The ideal interferometer would fully sample the Fourier Space and introduce no instrumental effects and the observed image can be calculated with the inverse Fourier Transform. A real world interferometer corrupts the observed image with the image with under-sampling, the antenna beam-pattern and other instrumental effects. The inverse Fourier Transform of the Visibilities can still be calculated, but it results in a corrupted "dirty" image. The observed image is convolved with a Point Spread Function (PSF) image with a Point Spread Function(PSF). The task is to reconstruct the observed image from the dirty image and the PSF, or more formally we try to solve for $x$ in equation \eqref{intro:eq:deconvolve}, where only the $PSF$ and $I_{dirty}$ are known($\star$ is used as the convolution operation).
+The ideal interferometer would fully sample the Fourier Space and introduce no instrumental effects and the observed image can be calculated with the inverse Fourier Transform. A real world interferometer corrupts the observed image with the image with under-sampling and other instrumental effects. The inverse Fourier Transform of the Visibilities can still be calculated, but it results in a corrupted "dirty" image. The observed image is convolved with a Point Spread Function (PSF) image with a Point Spread Function(PSF). The task is to reconstruct the observed image from the dirty image and the PSF, or more formally we try to solve for $x$ in equation \eqref{intro:eq:deconvolve}, where only the $PSF$ and $I_{dirty}$ are known($\star$ is used as the convolution operation).
 
 \begin{equation}\label{intro:eq:deconvolve}
 x \star  PSF + N = I_{dirty} 
 \end{equation}
 
-A deconvolution algorithm should find the observed image $x$. However, there may be many possible solutions to the equation \eqref{intro:eq:deconvolve}. Noise $N$ further complicates the deconvolution. The algorithm has to decide what is the most likely $x$ given $PSF$ and $I_{dirty}$. The PSF is specific to the interferometer. It models the sampling pattern in Fourier space, the antenna beam-pattern and more. A deconvolution algorithm is not limited to a single interferometer and can easily be used on other instruments\footnote{This is true for small field of view imaging. Wide field of view introduces additional effects that typically do not get modelled with a PSF}.
+A deconvolution algorithm should find the observed image $x$. However, there may be many possible solutions to the equation \eqref{intro:eq:deconvolve}. Noise $N$ further complicates the deconvolution. The algorithm has to decide what is the most likely $x$ given $PSF$ and $I_{dirty}$. The PSF is specific to the interferometer. It models the sampling pattern in Fourier space. A deconvolution algorithm is not limited to a single interferometer and can easily be used on other instruments\footnote{This is true for small field of view imaging. Wide field of view introduces additional effects that typically do not get modelled with a PSF}.
 
 CASA produces a the dirty image and the PSF for the VLA instrument.
 
 Note that the deconvolution problem is just one way of formulating the reconstruction. It was used in this project since the CASA interface was built for deconvolution algorithms. The same problem can be formulated as in-painting the missing Visibilities: If we apply the Fourier Transform to equation \eqref{intro:eq:deconvolve}, then the convolution turns to a multiplication and we arrive at a similar equation $X*M + N = V$. The Fourier Transform of $I_{dirty}$ is just the measured Visibilities $V$,  $PSF$ turns into a masking matrix $M$. $M$ is one for all measured Visibilities and zero everywhere else. If an algorithm can in-paint the missing Visibilities $X$, it has also found a solution $x$ to the deconvolution problem of \eqref{intro:eq:deconvolve}. In section \ref{cs:objective} the different formulations get discussed in more detail.
 
 
-\begin{figure}[h!]
-	\centering
-	\begin{subfigure}[b]{0.28\linewidth}
-		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/01.intro/img/antennas.png}
-		\caption{Antenna Configuration}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.28\linewidth}
-		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/01.intro/img/uv.png}
-		\caption{UV-Space}
-	\end{subfigure}
-
-	\begin{subfigure}[b]{0.28\linewidth}
-		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/01.intro/img/psf.png}
-		\caption{PSF}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.28\linewidth}
-		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/01.intro/img/dirty_image.png}
-		\caption{dirty image}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.28\linewidth}
-		\includegraphics[width=\linewidth, trim={18px 19px 18px 18px}, clip]{./chapters/01.intro/img/true_image.png}
-		\caption{true image}
-	\end{subfigure}
-	\caption{Deconvolution Problem VLA: Retrieve the true image when only PSF and dirty image are known}
-	\label{intro:measurement_problem}
-\end{figure}
-
 \subsection{Approximation with CLEAN}
-CLEAN assumes the image consists of single pixel wide point sources. This is true when the image contains stars, the majority of which are too far away from earth to have any extension. CLEAN therefore takes a dirty image and a PSF as input and tries to find point sources in the image. In each iteration of CLEAN, it searches the highest peak of the dirty image and removes a fraction of the PSF. It stops until the next highest peak is below a threshold, or if the maximum number of iterations was reached. The fraction of the PSF, threshold and number of iterations are tunable by the user.
+CLEAN assumes the image consists of single pixel wide point sources. This is true when the image contains stars, the majority of which are too far away from earth to have any extension. CLEAN therefore takes a dirty image and a PSF as input and tries to find point sources in the image. In each iteration of CLEAN, it searches the highest peak of the dirty image and removes a fraction of the PSF. It stops until the next highest peak is below a threshold, or if the maximum number of iterations was reached. The fraction of the PSF, threshold and number of iterations are tunable by the user. 
 
-CLEAN greedily optimizes the objective \eqref{intro:eq:clean}. Due to the L0 "norm", the objective is non-convex and it may have local minima. Note that the L0 "norm"\footnote{The L0 "norm" in this context is technically not a norm, hence the quotation marks. The L0 "norm" is a common notation in Compressed Sensing literature, therefore it is used here.} acts as the sum of non-zero elements in the image.
+CLEAN optimizes the objective \eqref{intro:eq:clean} which is split in a data and a regularization term. The data term forces CLEAN to reconstruct close to the measurements, while the regularization term should account for noise. In each iteration, CLEAN searches the step which minimizes the objective the most, it uses a greedy optimization scheme. Due to the L0 "norm"\footnote{The L0 "norm" in this context is technically not a norm, hence the quotation marks. The L0 "norm" is a common notation in Compressed Sensing literature, therefore it is used here.}, the objective is non-convex and it may have local minima. Note that the L0 "norm" acts as the sum of non-zero elements in the image.
 
 \begin{equation}\label{intro:eq:clean}
 \underset{x}{minimize} \: \left \| I_{dirty} - x \star PSF \right \|_2^2 + \: \left \| x \right \|_0
 \end{equation}
 
-Good approximation when the observed image contains point sources. However, there are also extended emissions in radio wavelengths like hydrogen clouds.
+In practice, CLEAN gets stopped before it reaches a local minima. A common stopping criteria is if the next peak in the dirty image is below 3 to 5 times the estimated noise level. In that case, CLEAN detects all peaks that are higher than 3 to 5 times the estimated noise. 
 
-The L0 "norm" makes this problem for non-convex: It may  it is in NP-Hard. There exist optimizer like Matching Pursuit that approximate the solution well enough for practice.
+CLEAN does a good approximation of the observed image, if it contains only point sources. Radio images may also contain extended emissions like hydrogen clouds, which are spread over several pixels. The maximum of extended emissions tends to be far lower than for point sources. Any pixel of the extended emission that is lower than 3 to 5 times the estimated noise gets ignored. If an extended emission is above the threshold, CLEAN approximates it with faint point sources. Instead of a hydrogen clouds, CLEAN may detect a cluster of faint stars.
 
-but CLEAN does not minimize to an optima, it stops early. Hard to analyse how close the current solution is to the true minimum.
+To combat the problem, the reconstructed image of CLEAN gets convolved with the antenna beam-pattern. The beam-pattern is approximately a two dimensional Gaussian and represents the accuracy of the antennas. Clusters of faint stars get blurred into a more plausible cloud. This essentially lowers the resolution of the reconstructed image. The rationale is that any higher resolved structure is likely a reconstruction artefact. Over the years, the algorithm was extended, with the MS-MFS-CLEAN\cite{rau2011multi} as a recent example. All versions do blur the reconstructed image with the antenna beam-pattern.
 
-Convolution with antenna beam-pattern.
-
-CLEAN does a greedy approximation of the deconvolution problem, and assumes the resulting image consists out of a few point sources. The question remains, how close the CLEAN approximation is to the true image? If the true image consists out of a few point sources, CLEAN produces a good approximation. Extended emissions however get approximated by a large number of faint point sources. The peak of extended emissions are generally lower than of point sources. CLEAN has more trouble distinguishing extended sources from noise. Future interferometers like MeerKAT will become more sensitive to fainter sources. The reconstruction task for new instruments may contain more faint and extended sources. Ideally, we would modify the regularization of CLEAN and explicitly model the new effects. Sadly, the regularization is a fixed part of the CLEAN algorithm.
+The CLEAN prior works well for point sources, but it does not accurately reconstruct extended emissions. With the right prior super-resolved image reconstruction is possible. It was demonstrated in laboratory environment with the One Pixel Camera\cite{singlePixel}, or with the SASIR\cite{girard2015sparse} reconstruction algorithm on the LOFAR radio interferometer. Since the prior of CLEAN is a fixed part of the algorithm it cannot be modified without creating a new algorithm.
 
 
 \subsection{CLEAN as Compressed Sensing Image Reconstruction}
+
+Compressed Sensing can be thought of a generalization of CLEAN. With that, CLEAN is a specific
+
 An image reconstruction algorithm in the Compressed Sensing Framework consists of three parts:
 
 \begin{itemize}
