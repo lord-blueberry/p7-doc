@@ -52,35 +52,26 @@ The CLEAN prior works well for point sources, but it does not accurately reconst
 
 
 \subsection{CLEAN as Compressed Sensing Image Reconstruction}
-
-Compressed Sensing can be thought of a generalization of CLEAN. With that, CLEAN is a specific
-
-An image reconstruction algorithm in the Compressed Sensing Framework consists of three parts:
-
+Compressed Sensing Image Reconstruction is a generalization of the CLEAN algorithm. A Compressed Sensing Reconstruction algorithm consists of three separate parts:
 \begin{itemize}
+	\item An objective with a data and regularization term, and a parameter $\lambda$.
 	\item A prior function $p()$.
 	\item An optimization algorithm.
-	\item An objective with a data and regularization term.
 \end{itemize}
 
-CLEAN is a Compressed Sensing Reconstruction algorithm with specific choices for prior, optimization algorithm. and objective. The prior $p()$ in CLEAN is the L0 "norm", Matching Pursuit as the optimization algorithm. The objective from CLEAN needs a additional parameter $\lambda$.  [which represents the trade-off between deconvolution and regularization.] the more noisy it is, the more regularization is needed. We arrive at the similar \eqref{intro:eq:csclean}.
+As the prior function $p()$, CLEAN uses the L0 "norm". The optimization algorithm is similar to Matching Pursuit. In each iteration, Matching Pursuit searches the element in the regularization term that minimizes the objective the most. The objective of CLEAN can also be generalized into \eqref{intro:eq:csclean}. The objective still has a data and regularization term, but now the parameter $\lambda$ represents the trade-off between reconstructing close to the measurement and reconstructing a plausible image.
 
 \begin{equation}\label{intro:eq:csclean}
 \underset{x}{minimize} \: \left \| D_{dirty} - x \star PSF \right \|_2^2 \: + \: \lambda \: p(x) 
 \end{equation}
 
-All that was changes was an additional parameter $\lambda$, so why would one want to do this? 
-Applying non-convex optimization techniques,
-Theoretical guarantees of compressed Sensing.
-Replacing $p()$ with anything else
+CLEAN is similar to a Compressed Sensing Reconstruction consisting of the L0 "norm", matching pursuit and the objective \eqref{intro:eq:csclean}. But now, individual parts of the Compressed Sensing Reconstruction can be replaced. For example instead of the L0 "norm", one could use the L2 norm, or apply the Haar Transform and use the L0 "norm" on the Haar Wavelet coefficients of $x$. The prior function $p()$ can be chosen according to our prior knowledge and potentially super-resolve the image $x$.
+
 
 Now we can minimize \eqref{intro:eq:csclean} with non-convex optimization techniques, we can analyse how calculate lower limits for the objective.
 
 
-We assume $x$ assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image.
 
-
-Compressed sensing reconstruction is able to reconstruct the observation even from undersampled measurements. Even though shannon-nyquist theorem is higher.
 
 The guarantees of Compressed Sensing Reconstruction: Incoherent from the measurement space and sparse space is sparse.
 

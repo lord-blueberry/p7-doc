@@ -1,8 +1,22 @@
 \section{Compressed Sensing Image Reconstruction} \label{cs}
+We want to reconstruct an image from under-sampled measurements. We can retrieve the true image if:
 
-The Framework Flexibility
+\begin{itemize}
+	\item we have prior information about the image
+	\item measurement space and reconstruction space are incoherent
+\end{itemize}
 
-A lot of choice in building a reconstruction algorithm. No best
+If the interferometer measures sky section which only contains point sources, the objective \eqref{intro:eq:csclean} with the L0 "norm" as prior $p()$ can reconstruct the true image from under-sampled Fourier components. The L0 "norm" is the sum of non-zero elements. The more elements of the image are zero, the lower the regularization term in the objective \eqref{intro:eq:csclean}. This forces the reconstructed image to be sparse, it contains only few non zero elements, or in other words, that the image consists of a limited number of point sources. 
+
+Let us assume there are $s$ point sources in the image. If we would know the number and location of the $s$ point sources before, all we would need are $s$ samples to determine their magnitude. Sadly, we do not know the location before in general. The naive approach is therefore to sample at every pixel location. However, this is wasteful: Note that if we land at an empty pixel, the sample gives us almost no new information. If we would sample the whole image pixel for pixel, our average information gain per sample is low. In the under-sampled environment, we only have a limited number of samples available, we want to maximize the information gain for each sample. This is the case when the measurement space is incoherent from the reconstruction space.
+
+The interferometers measure in the Fourier domain, which is maximally incoherent from the image domain. A change in a single pixel will modify all Visibilities, while a change in a single Visibility will modify all pixels. Intuitively, with each sample we now learn information about the $s$ point sources. The average information gain per sample is maximized and we can reconstruct the even from under-sampled measurements.
+
+Now the question remains, how many samples are needed to reconstruct the image. 
+How many samples are needed now to reconstruct the image?
+
+We assume $x$ assumes the $x$ contains a few point sources. In Compressed Sensing terminology, it assumes $x$ is sparse in image space. Since $x$ is already an image.
+Guarantees
 
 Gurobi\cite{gurobi2018optimizer} was used.constrained optimization.
 
@@ -39,10 +53,6 @@ Finding the right sparseland prior is a modelling task. It codes our prior knowl
 Any combination of functions
 
 Sparseland priors naturally lend themselves to overcomplete representations. D has many more rows than columns.
-
-
-
-
 
 
 \subsection{Choosing the Objective Function} \label{cs:objective}
@@ -118,7 +128,7 @@ CASA is a software package built for reconstructing images for VLA.
 
 CASA works in two separate cycles, the major and minor cycle. The major cycle transforms the Visibilities to image space and back using the Fourier Transform. The minor cycle is the deconvolution algorithm, which tries to find the true image from a dirty image and a PSF. 
 
-The first major cycle iteration creates the PSF and the dirty image. Then, several minor cycle deconvolve the dirty image. The major cycle then continues, transforms the deconvolved image back to Visibilities. The major cycle ends by calculating the residual Visibilities from the measurement and the deconvolution. The next major cycle continues by transforming the residual Visibilities. At the end of several major cycle, the model column should contain an approximation of the true visibilities while the residuals should be noise. %it is a $\mathcal{X}^2$ approximation of the Visibilities.
+The first major cycle iteration creates the PSF and the dirty image. Then, several minor cycle deconvolve the dirty image. The major cycle then continues, transforms the deconvolved image back to Visibilities. The major cycle ends by calculating the residual Visibilities from the measurement and the deconvolution. The next major cycle continues by transforming the residual Visibilities. At the end of several major cycle, the model column should contain an approximation of the true visibilities while the residuals should be noise. 
 
 In CASA the major cycle is fixed. It was evaluated if it can be modified, but a modification was too time consuming in the context of the project. However CASA allows for the addition of new deconvolution algorithms. 
 
