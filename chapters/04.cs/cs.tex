@@ -6,17 +6,17 @@ We want to reconstruct an image from under-sampled measurements. We can retrieve
 	\item measurement space and reconstruction space are incoherent
 \end{itemize}
 
-If the interferometer measures sky section which only contains point sources, the objective \eqref{intro:eq:csclean} with the L0 "norm" as prior $p()$ can reconstruct the true image from under-sampled Fourier components. The L0 "norm" is the sum of non-zero elements. The more elements of the image are zero, the lower the regularization term in the objective \eqref{intro:eq:csclean}. This forces the reconstructed image to be sparse, it contains only few non zero elements, or in other words, that the image consists of a limited number of point sources. 
+If the interferometer measures sky section which only contains point sources, the objective \eqref{intro:eq:csclean} with the L0 "norm" as prior $p()$ can reconstruct the true image from under-sampled Fourier components. The L0 "norm" is the sum of non-zero elements. The more elements of the image are zero, the lower the regularization term in the objective \eqref{intro:eq:csclean}. This forces the reconstructed image to be sparse, it contains only few non zero elements, or in other words, it assumes the image contains few point sources. 
 
 Let us assume there are $s$ point sources in the image. If we would know the number and location of the $s$ point sources before, we could sample the $s$ pixels to determine their magnitude. Sadly, we do not know the location before in general. The naive approach is therefore to sample at every pixel location. However, this is wasteful: Note that if we land at an empty pixel, the sample gives us almost no new information. If we would sample the whole image pixel for pixel, our average information gain per sample is low. In the under-sampled environment, we only have a limited number of samples available, we want to maximize the information gained for each sample. This is the case when the measurement space is incoherent from the reconstruction space.
 
-The interferometers measure in the Fourier domain, which is maximally incoherent from the image domain. A change in a single pixel will modify all Visibilities, while a change in a single Visibility will modify all pixels. Intuitively, with each sample we now learn information about the $s$ point sources. The average information gain per sample is maximized and we can reconstruct the even from under-sampled measurements. It works because we only need information about the $s$ non-zero pixels.
+Interferometers measure in the Fourier domain, which is maximally incoherent from the image domain. A change in a single pixel will modify all Visibilities, while a change in a single Visibility will modify all pixels. Intuitively, with each sample we now learn information about the $s$ point sources. The average information gain per sample is maximized and we can reconstruct the even from under-sampled measurements. It works because we only need information about the $s$ non-zero pixels.
 
-The question remains, how many samples are needed to reconstruct the image? \cite{candes2011probabilistic}
-If the image also contains extended emissions, it increases the number of non-zero pixels $s$. In turn, this may increase the amount of information we need, which may increase the number of samples needed. However, if we can find a domain in which images with extended emissions and point sources can be sparsely represented, we can reduce the needed samples.
+The question remains, how many samples are needed to reconstruct the image? The answer to that question is an active field of research\cite{candes2011probabilistic}, but depends (among other factors) on the number of non-zero entries in the prior $s$. If the image also contains extended emissions, it increases the number of non-zero pixels $s$, which in turn increases the needed samples. However, if we can find a domain in which images with extended emissions and point sources can be sparsely represented, we can reduce the needed samples.
 
 
 \subsection{Sparseland Prior and Overcomplete Representations}
+
 
 Finding a space in which the image can be sparsely represented may be difficult. Many natural images are sparse in the wavelet domain, 
 
@@ -36,7 +36,7 @@ For example, if we know our image can be sparsely represented in the wavelet dom
 
 Many natural signals consists of signal parts. We can mix and match different approaches as dirac basis and wavelets to represent extended emissions.
 
-cs:eq:sparseDic
+ways to find a dictionary
 
 Together with the L0 "norm",
 It is a common prior used in Compressed Sensing applications. Over-complete priors have been developed for radio astronomy with the examples of Starlets\cite{starck2015starlet} and Curvelets\cite{starck2003astronomical}. 
