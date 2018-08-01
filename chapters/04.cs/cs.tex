@@ -49,8 +49,6 @@ in-painting:\qquad \underset{V_2}{minimize} \:& \left \|  I_{dirty} - F^{-1} M V
 
 All three objective functions have the same global minimum. Retrieving $x$ for the analysis objective is trivial. For the second and third objective $x$ can be retrieved by $x = D\alpha$ and by $x = F^{-1}V_2$ respectively. However, depending on the measurement space and prior, an objective might become more practical. The analysis and in-painting objective require the inverse of the dictionary $D^{-1}$. It exists for orthogonal transformation like the Haar Wavelet transform, but in general does not exist for over-complete dictionaries. For over-complete dictionaries, the Synthesis objective gets used. There are a few notable exceptions like the Starlet Transform, which is both an over-complete representation but also has an inverse $D^{-1}$ defined. Similarly, the in-painting method is useful when the prior is defined as a convolution with the image, since it can be represented as a multiplication in the Fourier domain.During this project, no reconstruction algorithm was found which uses the in-painting method.
 
-So far the data term always featured the deconvolution. 
-
 
 \subsection{Compressed Sensing Reconstruction Algorithms in Astronomy}
 In Astronomy, Compressed Sensing reconstruction algorithms are an active field of research. There is a diverse list of Algorithms. Three are represented here:
@@ -60,11 +58,14 @@ In Astronomy, Compressed Sensing reconstruction algorithms are an active field o
 	\item SASIR \cite{girard2015sparse}
 \end{itemize}
 
-\textbf{PURIFY} uses the analysis objective and SDMM as the optimizer. As the prior, it uses a combination of Dirac basis and Daubechies Wavelets. 
+\textbf{PURIFY} uses the analysis objective and SDMM as the optimizer. As the prior, it uses a combination of Dirac basis and Daubechies Wavelets. With the SDMM optimizer PURIFY is a scalable approach which can easily be used on distributed to computing clusters.
 
-\textbf{Vis-CS} uses the synthesis objective and Coordinate Descent as the optimizer. The prior is a dictionary of Gaussian funtions.  
+\textbf{Vis-CS} uses the synthesis objective and Coordinate Descent as the optimizer. The prior is a dictionary of Gaussian funtions.
+ NO user interaction required
 
-\textbf{SASIR} uses the synthesis objective and FISTA as the optimizer. The prior is the Starlet Transform which  multi scale prior. With this prior, it reconstructed super-resolved images from the LOFAR interferometer.
+\textbf{SASIR} uses the synthesis objective and FISTA as the optimizer. The prior is the Starlet Transform. Starlets have a multi-resolution representation.
+
+With this prior, it reconstructed super-resolved images from the LOFAR interferometer.
 
 
 \subsection{Implementation In CASA}

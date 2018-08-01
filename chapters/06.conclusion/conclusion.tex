@@ -1,7 +1,5 @@
 \section{Future in Compressed Sensing Reconstruction}
-The flexibility of Compressed Sensing Reconstructions allows us to change the prior according to our previous knowledge, all while keeping the same objective and optimization algorithm. The prior can be updated as our knowledge changes. It was able to find plausible structures smaller than the antenna beam-width. Using Compressed Sensing Reconstructions gives us theoretical guarantees that,  if our prior models the observation well enough, we reconstruct the true image from under-sampled measurements.
-
-%There are many possible combinations of prior, optimization algorithm and objective. So far, no optimal combination has been found. 
+The flexibility of Compressed Sensing Reconstructions allows us to change the prior according to our previous knowledge, all while keeping the same objective and optimization algorithm. The prior can be updated as our knowledge increases. The reconstruction was able to find plausible structures smaller than the antenna beam-width. Using Compressed Sensing Reconstructions gives us theoretical guarantees that, if our prior models the observation well enough, we reconstruct the true image from under-sampled measurements.
 
 A proof of Compressed Sensing Reconstruction was implemented in CASA as a minor cycle deconvolver. It takes the dirty image and point spread function as input and calculates the optimal deconvolution according to the objective. The current implementation has a quadratic memory requirement. It does not scale to any practical image size for VLA observations. New interferometers like MeerKAT will require even larger images. The current implementation is not suited for large scale reconstructions. 
 
