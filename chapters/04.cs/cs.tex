@@ -18,7 +18,7 @@ The question remains, how many samples are needed to reconstruct the image? The 
 \subsection{Sparseland Prior and over-complete Representations}
 An image containing both point sources and extended emissions is not sparse in the image domain. When using the L0 "norm" as the prior, we want to reconstruct in a domain where the image can be as sparsely represented as possible. From image compression, we know that natural images tend to be sparse in the Wavelet domain. We can use for example the Haar transform in the prior: $p(x) = \left \| Hx \right \|_0$ and potentially have a more sparse representation.
 
-But why limit the prior to Wavelets? The prior function can be designed as we wish. Wavelets, sine functions or splines together can be used for the reconstruction. In practice many Compressed Sensing applications use a "sparseland" prior \eqref{cs:eq:sparseDic}, a matrix $D$ where each column contains a function the image. The dictionary matrix $D$ is potentially a large, but has a finite number entries. Any image $x$ we measure consists only of a few entries of $D$. This means the coefficients for the signal parts in the dictionary $\alpha$ are all zero except for $s$ entries for all valid $x$.
+But why limit the prior to Wavelets? The prior function can be designed as we wish. Wavelets, sine functions or splines together can be used for the reconstruction. In practice many Compressed Sensing applications use a "sparseland" prior \eqref{cs:eq:sparseDic}, a matrix $D$ where each column contains a function potential part of the image. The dictionary matrix $D$ is potentially a large, but has a finite number entries. Any image $x$ we measure consists only of a few entries of $D$. This means the coefficients for the signal parts in the dictionary $\alpha$ are all zero except for $s$ entries for all valid $x$.
 
 \begin{equation} \label{cs:eq:sparseDic}
 \begin{split}
@@ -27,30 +27,16 @@ x = D \alpha  \qquad  x \in \mathbb{R}^{n}, \alpha \in \mathbb{R}^{m}, D \in \ma
 \end{split}
 \end{equation}
 
+We can decide with what we fill the columns. Since $D$ can be a mixture of functions and we know point sources are sparse in the image domain, we can use the identity matrix (also sometimes called Dirac basis), which represents single pixel values, and further add columns consisting of wavelets. The number of columns $m$ can be much larger than the number of pixels $n$, which lends itself to over-complete representations.
 
-For example, if we know our image can be sparsely represented in the wavelet domain, we can create a dictionary of wavelets. The dictionary is not restricted to be square, we can add more signal parts than there are pixels, which lends itself to over-complete representations.
+An over-complete dictionary has more columns than rows (more entries in the dictionary than pixels) and can be used represent an image with even fewer non-zero entries $s$. Starlets\cite{starck2015starlet} and Curvelets\cite{starck2003astronomical} have been developed as over-complete representations for astronomy. In theory, there is no limitation on how many columns we add, but in practice computation power.
 
-Many natural signals consists of signal parts. We can mix and match different approaches as dirac basis and wavelets to represent extended emissions.
-
-ways to find a dictionary
-
-Together with the L0 "norm",
-It is a common prior used in Compressed Sensing applications. Over-complete priors have been developed for radio astronomy with the examples of Starlets\cite{starck2015starlet} and Curvelets\cite{starck2003astronomical}. 
-
-Find a dictionary $D$ in which radio can be seen as finding a compression space.
-
-
-Finding the right sparseland prior is a modelling task. It codes our prior knowledge about radio sources and what they might produce. Sparseland priors are in use by for example with 
-
-Computational limits
-
-Gurobi\cite{gurobi2018optimizer} was used.constrained optimization.
-
-The prior $p()$ can be any function like the LP norm.
+Sparseland priors are used with either the L0 "norm" or the L1 norm. The L0 "norm" pushes the objective into non-convex territory. There are specialized optimizers for L0 objectives that approximate the optimum well enough for practical applications. The L0 norm can be relaxed to L1, which results in a convex objective and is practically guaranteed to have the same optimum. In this project, the Gurobi Gurobi\cite{gurobi2018optimizer} optimizer was used with the L1 relaxation.
 
 We could use L2, but what we mostly want in Compressed Sensing Reconstruction is sparsity. 
 With that, L0 "norm" is often used. 
 The L1 relaxation however is practically guaranteed to have the same minimum as the L0 norm and results in a convex objective function. Since Gurobi works better on the L1 relaxation it was chosen for this project.
+
 
 \subsection{Choosing the Objective Function} \label{cs:objective}
 In general, there are three different reconstruction objectives: The analysis method, where the image $x$ is minimized directly, the synthesis method where the sparse vector $\alpha$ is minimized, or by in-painting the missing Visibilities $V_2$.

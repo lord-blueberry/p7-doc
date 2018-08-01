@@ -164,7 +164,7 @@ plotline <- function(mod.list, files1, files2, outfolder) {
   df1$image <- factor(df1$image, levels = unique(df1$image), ordered=TRUE)
   df2$image <- factor(df2$image, levels = unique(df2$image), ordered=TRUE)
   png(paste(outfolder,"df1", ".png",sep=""),
-      width = 12.0,
+      width = 10.0,
       height = 6.0,
       units = "in",
       res = 200)
@@ -179,7 +179,7 @@ plotline <- function(mod.list, files1, files2, outfolder) {
         )
   dev.off()
   png(paste(outfolder,"df2", ".png",sep=""),
-      width = 12.0,
+      width = 10.0,
       height = 6.0,
       units = "in",
       res = 200)
