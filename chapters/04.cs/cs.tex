@@ -58,14 +58,11 @@ In Astronomy, Compressed Sensing reconstruction algorithms are an active field o
 	\item SASIR \cite{girard2015sparse}
 \end{itemize}
 
-\textbf{PURIFY} uses the analysis objective and SDMM as the optimizer. As the prior, it uses a combination of Dirac basis and Daubechies Wavelets. With the SDMM optimizer PURIFY is a scalable approach which can easily be used on distributed to computing clusters.
+\textbf{PURIFY} uses the analysis objective and SDMM as the optimizer. As the prior, it uses a combination of Dirac basis and Daubechies Wavelets. With the SDMM optimizer PURIFY is a scalable approach which can easily be distributed on computing clusters.
 
-\textbf{Vis-CS} uses the synthesis objective and Coordinate Descent as the optimizer. The prior is a dictionary of Gaussian funtions.
- NO user interaction required
+\textbf{Vis-CS} uses the synthesis objective and Coordinate Descent as the optimizer. The prior is a dictionary of Gaussian funtions and was developed for x-ray imaging. The reconstruction reduces the number of parameters and can be used for automated reconstruction. 
 
-\textbf{SASIR} uses the synthesis objective and FISTA as the optimizer. The prior is the Starlet Transform. Starlets have a multi-resolution representation.
-
-With this prior, it reconstructed super-resolved images from the LOFAR interferometer.
+\textbf{SASIR} uses the synthesis objective and FISTA as the optimizer. The prior is the Starlet Transform. The Starlet Transform uses a multi-resolution representation and with it, the SASIR algorithm was able to reconstruct super-resolved image for the LOFAR interferometer. The Starlet Transform was also implemented in this project and compared to standard CLEAN images in section \ref{results}.
 
 
 \subsection{Implementation In CASA}
@@ -81,21 +78,11 @@ With this prior, it reconstructed super-resolved images from the LOFAR interfero
 
 The process of reconstructing an image in CASA is split in two separate cycles: The major and the minor cycle. The major cycle transforms the Visibilities to image space and back using the Fourier Transform. The minor cycle is the deconvolution algorithm, which tries to find the true image from a dirty image and a PSF. 
 
-The first major cycle iteration creates the PSF and the dirty image. Then, several minor cycle deconvolve the dirty image. The major cycle then continues and transforms the deconvolved image back to Visibilities. The major cycle ends by calculating the residual Visibilities from the measurements. The next major cycle continues by transforming the residual Visibilities. At the end of several major cycles (and with many, many minor cycle iterations) the model column should contain an approximation of the true visibilities while the residuals should be noise. 
+The first major cycle iteration creates the PSF and the dirty image. Then, several minor cycle deconvolve the dirty image. The major cycle then continues and transforms the deconvolved image back to Visibilities. The major cycle ends by calculating the residual Visibilities from the measurements. The next major cycle continues by transforming the residual Visibilities. At the end of several major cycles (and with many, many minor cycle iterations) the model column should contain an approximation of the true visibilities while the residuals should contain the noise. 
+ 
+The major cycle is an expensive operation. It is responsible for creating the dirty image and with that, it is also responsible for handling any wide field imaging effects. The major and minor cycle separation is built for CLEAN. A Compressed Sensing deconvolution is able to reconstruct the image in one major cycle iteration. 
 
-
-The major and minor cycle separation is built for CLEAN.
-
-
-In CASA the major cycle is fixed. It was evaluated if it can be modified, but a modification was too time consuming in the context of the project. However CASA allows for the addition of new deconvolution algorithms. 
-
-Major Cycle is expensive.Note that all small field or wide field imaging operations are. Compressed Sensing only needs one
-
-
-Major cycle is more expensive to compute than a CLEAN minor cylce. 
-
-CLEAN needs potentially many major cycle iterations. A Compressed Sensing Reconstruction would converge to the optimum in one major cylce. Here lies a potential speedup for the Compressed Sensing Reconstruction.
-
+Future instruments like SKA produce more data and require image reconstruction on a new scale. A big question for reconstruction algorithms is how well do they scale on very large image sizes and how well can they be distributed. The CLEAN algorithm is simple compared to a Compressed Sensing Reconstruction, CLEAN may have the edge in scalability. However, in real world applications CLEAN gets used as a minor cycle deconvolver, and it may need several expensive major cycles to reconstruct an image. The SASIR and PURIFY algorithms include the major cylce operations in the data term With a distributed optimizer like SDMM, a Compressed Sensing Reconstruction can solve both, major and minor cycle operations and has the potential to scale better on large problem sizes.
 %CASA is a software package built for solving the deconvolution problem for instruments like VLA and ALMA. "Data" Column measurements(calibrated), model column contains the "true" visibilities and the residual column only noise. The architecture is oriented after the CLEAN algorithm, it is split in a major and minor cycle.\ref{cs:major}. The first part of the major cycle produces the dirty image and the PSF. The minor cycle is where a deconvolution algorithm "cleans" the dirty image, several iterations of CLEAN. Major cycle ends with the forward fourier transform. Chi$^2$ approximation of the visibilities.
 
 %The idea of the dirty beam and the clean beam. The output of CASA is the model image convolved with the clean beam plus residuals. Because the model image contains many small peaks, any structure smaller than the clean beam is implausible. Convolving with a gaussian is essentially reducing the resolution. But this is not the case. CLEAN can lead to implausible model images depending on the content: If only a few point sources are visible, clean is plausibe. But for extended emissions clean produces a an area of many peaks which is not true.. With compressed sensing, the ideal prior leads to the true model image. 
