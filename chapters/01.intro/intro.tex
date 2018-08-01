@@ -1,7 +1,7 @@
 \section{Reconstruction from under-sampled Measurements}\label{intro}
 In Signal Processing, continuous signals are represented with discrete samples. A digital recording of music, an image of a tree, or the measured velocity of a particle, all are discrete samples of continuous signals. The Nyquist-Shannon sampling rate tells us how many samples are needed to fully represent a signal: A signal which contains at most frequency $f$ should be sampled with a frequency higher than $2f$. For example if we record a piece of music where the highest tone is at 20kHz, sampling rate should be more than 40kHz. Then, the music piece gets recorded above the Nyquist-Shannon sampling rate. It is fully sampled and there is exactly one continuous signal(with maximum frequency $f$) which fits the measurement.
 
-The Nyquist-Shannon sampling rate is not always achievable: Samples may be expensive to acquire, corrupted by noise, or incomplete by the nature of the measurement instrument. In this case we are dealing with under-sampled measurements. Many possible signals fit the measurement and from the measurement alone, we cannot distinguish the true signal from all possibilities.
+The Nyquist-Shannon sampling rate is not always achievable: Samples may be expensive to acquire, get lost, or incomplete by the nature of the measurement instrument. In this case we are dealing with under-sampled measurements. Many possible signals fit the measurement and from the measurement alone, we cannot distinguish the true signal from all possibilities.
 
 With the Theory of Compressed Sensing\cite{candes2006robust}\cite{donoho2006compressed} however, we can use prior information about the signal and find the most likely candidate from all possibilities. Under the right conditions, the most likely candidate is guaranteed to be the true signal. With the Theory of Compressed Sensing, we exploit prior information to reconstruct the true signal from under-sampled measurements.
 
@@ -48,7 +48,7 @@ CLEAN does a good approximation of the observed image, if it contains only point
 
 To combat the problem, the reconstructed image of CLEAN gets convolved with the antenna beam-pattern. The beam-pattern is approximately a two dimensional Gaussian and represents the accuracy of the antennas. Clusters of faint stars get blurred into a more plausible cloud. This essentially lowers the resolution of the reconstructed image. The rationale is that any higher resolved structure is likely a reconstruction artefact. Over the years, the algorithm was extended, with the MS-MFS-CLEAN\cite{rau2011multi} as a recent example. All versions do blur the reconstructed image with the antenna beam-pattern.
 
-The CLEAN prior works well for point sources, but it does not accurately reconstruct extended emissions. With the right prior super-resolved image reconstruction is possible. It was demonstrated in laboratory environment with the One Pixel Camera\cite{singlePixel}, or with the SASIR\cite{girard2015sparse} reconstruction algorithm on the LOFAR radio interferometer. Since the prior of CLEAN is a fixed part of the algorithm it cannot be modified without creating a new algorithm.
+The CLEAN prior works well for point sources, but it does not accurately reconstruct extended emissions. With the right prior super-resolved image reconstruction is possible. It was demonstrated in laboratory environment with the One Pixel Camera\cite{singlePixel}, or with the SASIR\cite{girard2015sparse} reconstruction algorithm for the LOFAR radio interferometer. Since the prior of CLEAN is a fixed part of the algorithm it cannot be modified without creating a new algorithm.
 
 
 \subsection{CLEAN as Compressed Sensing Image Reconstruction}
@@ -66,37 +66,6 @@ As the prior function $p()$, CLEAN uses the L0 "norm". The optimization algorith
 \end{equation}
 
 CLEAN is similar to a Compressed Sensing Reconstruction consisting of the L0 "norm", matching pursuit and the objective \eqref{intro:eq:csclean}. But now, individual parts of the Compressed Sensing Reconstruction can be replaced. For example instead of the L0 "norm", one could use the L2 norm, or apply the Haar Transform and use the L0 "norm" on the Haar Wavelet coefficients of $x$. The prior function $p()$ can be chosen according to our prior knowledge and potentially super-resolve the image $x$.
-
-
-Now we can minimize \eqref{intro:eq:csclean} with non-convex optimization techniques, we can analyse how calculate lower limits for the objective.
-
-
-
-
-The guarantees of Compressed Sensing Reconstruction: Incoherent from the measurement space and sparse space is sparse.
-
-Incoherence is easy. Interferometers measure in the Fourier space(This is an approximation for small field of view imaging. The approximation breaks apart in wide field of view). The image space is maximally incoherent from the Fourier space. Intuitively, A change in a single pixel will change all fourier components. A change in a single fourier component, changes all pixels.
-
-maximize the information gained for each element in the sparse space.
-
-The sparse space is here to distinguish true image from unlikely candidates. It models our prior knowledge.
-
-Then, one can reconstruct the true image from undersampled measurements. How many measurements are needed? that depends on how sparse it is. 
-
-Taking again CLEAN as an example, if we know the image contains only one point source, we can locate it with only a few Visibilities. However if the image contains many point sources located closely together, we need more Visibilities.
-
-The average case analysis is not trivial, 
-
-The prior and the optimization algorithm are disconnected and the prior $p()$ can be replaced for example with the L2 norm.
-
-%In the Compressed Sensing Framework, an approach is split into three separate parts. To demonstrate the flexibility of the Compressed Sensing Framework, we convert CLEAN into a Compressed Sensing approach.
-
-% First we add a regularization term to \eqref{intro:eq:clean} and arrive at the new objective \eqref{intro:eq:csclean}. The objective contains the original CLEAN data term and a new regularization term. The data term forces the reconstruction to be close to the measurement, while the regularization term forces the reconstruction to be plausible. $\lambda$ models the expected noise in the problem. Note that the $\left \| Px \right \|_0$ acts as an indicator function. 
-
-%The last step is choosing a similar optimization algorithm: In every iteration, CLEAN searches the highest peak in the dirty image. Matching Pursuit is a greedy optimization algorithm. In every iteration it searches the step which minimizes \eqref{intro:eq:csclean} the most. This Compressed Sensing approach is similar to CLEAN, but the new objective has a unique global minimum even with the presence of noise. The tunable parameters of CLEAN are replaced by a single parameter $\lambda$. 
-
-%The strength of Compressed Sensing Framework is its flexibility: The CLEAN prior works well on point sources, but is not ideal for extended emissions. In this Framework, the prior $P$ can be replaced without changing the objective or the optimization algorithm. This has led to increased interest in Compressed Sensing for wide Field of View imaging.
-
 
 
 

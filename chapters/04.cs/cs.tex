@@ -51,6 +51,8 @@ All three objective functions have the same global minimum. Retrieving $x$ for t
 
 The analysis and in-painting objective require the inverse of the dictionary $D^{-1}$. It exists for orthogonal transformation like the Haar Wavelet transform, but in general does not exist for over-complete dictionaries. For over-complete dictionaries, the Synthesis objective gets used. There are a few notable exceptions like the Starlet Transform, which is both an over-complete representation but also has an inverse $D^{-1}$ defined. Similarly, the in-painting method is useful when the prior is defined as a convolution with the image, since it can be represented as a multiplication in the Fourier domain.During this project, no reconstruction algorithm was found which uses the in-painting method.
 
+So far the data term always featured the deconvolution. 
+
 Data term can also be in the Visibility domain
 
 
@@ -61,6 +63,7 @@ There are already Compressed Sensing implementations for different reconstructio
 	\item VIS-CS \cite{visCS}
 	\item SASIR \cite{girard2015sparse}
 \end{itemize}
+
 
 Purify:
 Prior: Mixture of Dirac Basis and Daubechies Wavelets (DB1 - DB8)
