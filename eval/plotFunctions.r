@@ -23,18 +23,15 @@ WriteMap <- function(x,plotLen=100) {
 }
 
 
-WriteMap2 <- function(x, at) {
+WriteMap2 <- function(x, at, scales) {
   par(mar=c(0,0,0,0),plt=c(0,0,0,0),oma=c(0,0,0,0))
   levelplot(x,
             at = at,
             margin=FALSE,
-            par.settings=list(
-              axis.line=list(col='transparent') # suppress axes and legend outline
-            ),
-            scales=list(draw=FALSE),
+
             col.regions=colorRampPalette(brewer.pal(n =11, name="RdYlGn")),
-            colorkey = FALSE,
-            xlab="",
+            scales=list(x=scales, y=scales),
+            xlab="arc minute",
             ylab=""
             
   )

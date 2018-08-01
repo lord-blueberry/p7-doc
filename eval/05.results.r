@@ -3,10 +3,10 @@ library(graphics)
 
 start.name=nchar("SNR_G55_10s.128.")
 
-read <- function(images) {
-  resoultion <- 26
+read <- function(images, resolution) {
+  
   pixels <- 128
-  axis <- 0:(pixels-1) * resoultion
+  axis <- round(0:(pixels-1) * resoultion/60, digits=1)
   images.list <- list()
   for(img in images) {
     data <- read.table(paste(inFolder, img, sep=""), header = FALSE, sep = ",")
@@ -39,14 +39,14 @@ writePNGs <- function(images.list, names, plotLen) {
         units = "in",
         res = 200)
     if(!grepl("raw", name)) {
-      print(WriteMap2(d,at=seq(min,max,length.out=plotLen)))
+      scales = list(at=c(1, 32, 64, 96, 128))
+      print(WriteMap2(d,at=seq(min,max,length.out=plotLen), scales))
     } else {
-      print(WriteMap2(d,at=seq(min(d),max(d),length.out=plotLen)))
+      print(WriteMap2(d,at=seq(min(d),max(d), length.out=plotLen), scales))
     }
     dev.off()
   }
 }
-
 
 calcline <- function(matrix, p0, p1, length.out=100) {
   a <- p1 - p0
@@ -80,8 +80,7 @@ calcline <- function(matrix, p0, p1, length.out=100) {
   return(line)
 }
 
-
-calcRowLine <- function(matrix, p0,p1,length.out=100) {
+calcRowLine <- function(matrix, p0,p1 ,length.out=100) {
   a <- p1 - p0
   x0 <- p0 + a*((-p0[2]+1)/ a[2])
   if(x0[1] > nrow(matrix)) {
@@ -96,14 +95,13 @@ calcRowLine <- function(matrix, p0,p1,length.out=100) {
   x_names <-rep(c(0),length.out=length.out)
   i = 1
   for(t in seq(0, 1, length.out = length.out)) {
-    pt <- x0+a*t
-    x_names[i] <- pt[1]
+    pt <- (x0+a*t)
+    x_names[i] <- pt[1] * 26/60
     i = i + 1
   }
   
   return(x_names)
 }
-
 
 plotline <- function(mod.list, files1, files2, outfolder) {
   p0 <- c(92,29)
@@ -169,7 +167,7 @@ plotline <- function(mod.list, files1, files2, outfolder) {
       units = "in",
       res = 200)
   print(ggplot(data = df1, aes(x=df1$index, y=df1$value, colour=df1$image)) + geom_line()
-        + xlab("arcseconds")
+        + xlab("arc minute")
         + ylab("Jansky/beam")
         + labs(colour='Image:')
         + scale_colour_brewer(palette = "Dark2")
@@ -184,7 +182,7 @@ plotline <- function(mod.list, files1, files2, outfolder) {
       units = "in",
       res = 200)
   print(ggplot(data = df2, aes(x=df2$index, y=df2$value, colour=df2$image)) + geom_line()
-        + xlab("arcseconds")
+        + xlab("arc minute")
         + ylab("Jansky/beam")
         + labs(colour='Image:')
         + scale_colour_brewer(palette = "Dark2")
@@ -195,38 +193,7 @@ plotline <- function(mod.list, files1, files2, outfolder) {
   dev.off()
 }
 
-
-writeExport <- function(mod.list, files1, files2) {
-  p0 <- c(92,29)
-  #p1 <- c(29,85)
-  p1 <- c(46,59)
-  interpolation.length <- 500
-  
-  df1 <- data.frame(matrix(ncol=length(files1), nrow=interpolation.length))
-  colnames(df1) <- files1
-  row.names <- rev(calcRowLine(data.matrix(mod.list[["raw_model"]]), p0, p1, interpolation.length))
-  rownames(df1) <- row.names
-  for (file in files1) {
-    print(file)
-    d = data.matrix(mod.list[[file]])
-    line  <- rev(calcline(d, p0, p1, interpolation.length))
-    df1[1:interpolation.length, file] = line
-  }
-  
-  df2 <- data.frame(matrix(ncol=length(files2), nrow=interpolation.length))
-  colnames(df2) <- files2
-  rownames(df2) <- row.names
-  for (file in files2) {
-    print(file)
-    d = data.matrix(mod.list[[file]])
-    line <- rev(calcline(d, p0, p1, interpolation.length))
-    df2[1:interpolation.length, file] = line
-  }
-  
-  write.table(df1, file="./data/part1.csv", sep=";")
-  write.table(df2, file="./data/part2.csv", sep=";")
-}
-
+resoultion <- 26.0
 inFolder = "../../p7-cs/results/supernova/csv/"
 outFolder = "../chapters/05.results/g55/"
 f <- dir(inFolder)
@@ -234,11 +201,11 @@ images <- f[endsWith(f, "image.csv")]
 residuals <- f[endsWith(f, "residual.csv")]
 models <- f[endsWith(f, "model.csv")]
 
-img.list <- read(images)
+img.list <- read(images, resoultion)
 img.names <- gsub("\\.", "_", substring(basename(images), start.name+1, nchar(basename(images))-4))
-res.list <- read(residuals)
+res.list <- read(residuals, resoultion)
 res.names <- gsub("\\.", "_", substring(basename(residuals), start.name+1, nchar(basename(residuals))-4))
-mod.list <- read(models)
+mod.list <- read(models, resoultion)
 mod.names <- gsub("\\.", "_", substring(basename(models), start.name+1, nchar(basename(models))-4))
 
 #modify clean
@@ -259,8 +226,4 @@ files2 <- c( "clean_model", "L1+L2_model","TV_model", "starlets3_model")
 library(ggplot2)
 library(scales)
 
-plotline(mod.list, files1, files2,"../chapters/05.results/")
-
-files1 <- c("raw_image", "clean_image", "positive_deconv_image", "L1_image", "L2_image")
-files2 <- c( "clean_image", "L1+L2_image","TV_image", "starlets3_image")
-plotline(img.list,files1, files2)
+plotline(mod.list, files1, files2, "../chapters/05.results/")
