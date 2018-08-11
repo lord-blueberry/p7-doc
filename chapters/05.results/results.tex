@@ -32,12 +32,10 @@ The CLEAN algorithm gets compared to Compressed Sensing Reconstructions. The par
 	\item Starlet Transform
 \end{enumerate}
 
-The regularization parameter $\lambda$ needs to be estimated for each prior. The Miller\cite{miller1970least} $\lambda$ estimation was used and is shown in equation \eqref{results:eq:miller}. [Estimation of the noise level $e$, divided and $E$]. An approximate solution is needed to define the noise level and the amount of regularization. In this project, the result with no regularization was used for the $\lambda$ estimation.
-
-This is not an ideal estimation, the image effectively gets reconstructed twice. Other Compressed Sensing Reconstructions approximate $x$ of equation \eqref{results:eq:miller} by running their optimizer a couple of iterations without regularization, which reduces the computational costs. 
+The regularization parameter $\lambda$ needs to be estimated for each prior. The Miller\cite{miller1970least} $\lambda$ estimation was used and is shown in equation \eqref{results:eq:miller}. An approximate solution is needed for the bounds $e$ and $E$. In this project, the result with no regularization was used for the $\lambda$ estimation. For practical applications the image effectively gets reconstructed twice. Other Compressed Sensing Reconstructions approximate $x$ of equation \eqref{results:eq:miller} by running their optimizer a fixed number of iterations without regularization, which reduces the computational costs.
 
 \begin{equation}\label{results:eq:miller}
-	\lambda \approx e / E \qquad  \left \| I_{dirty} - x \star PSF \right \|_2^2 \le e \qquad p(x) \le E
+	\lambda = e / E \qquad  \left \| I_{dirty} - x \star PSF \right \|_2^2 \le e \qquad p(x) \le E
 \end{equation}
 
 Two figures compare the Dirty Image, CLEAN and the Compressed Sensing Reconstrutions. Figure \ref{res:g55:img} shows the reconstructed images on the same intensity scale. Figure \ref{res:g55:profile} shows the flux profile of a cut through the reconstructed images. The Cut through the remnant is located in the center of the profile image.
