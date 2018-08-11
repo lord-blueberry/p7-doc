@@ -32,6 +32,8 @@ The CLEAN algorithm gets compared to Compressed Sensing Reconstructions. The par
 	\item Starlet Transform
 \end{enumerate}
 
+To reduce the memory requirements, the PSF was truncated. Any value smaller than 0.02 of the PSF was truncated to zero. The current implementation requires a quadratic amount of memory per pixel. The images here have a size of $128*128$ pixels, which was the maximum for current desktop machines.
+
 The regularization parameter $\lambda$ needs to be estimated for each prior. The Miller\cite{miller1970least} $\lambda$ estimation was used and is shown in equation \eqref{results:eq:miller}. An approximate solution is needed for the bounds $e$ and $E$. In this project, the result with no regularization was used for the $\lambda$ estimation. For practical applications the image effectively gets reconstructed twice. Other Compressed Sensing Reconstructions approximate $x$ of equation \eqref{results:eq:miller} by running their optimizer a fixed number of iterations without regularization, which reduces the computational costs.
 
 \begin{equation}\label{results:eq:miller}

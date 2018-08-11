@@ -28,8 +28,6 @@ x \star  PSF + N = I_{dirty}
 
 A deconvolution algorithm should find the observed image $x$. However, there may be many possible solutions to the equation \eqref{intro:eq:deconvolve}. Noise $N$ further complicates the deconvolution. The algorithm has to decide what is the most likely $x$ given $PSF$ and $I_{dirty}$. The PSF is specific to the interferometer. It models the sampling pattern in Fourier space. A deconvolution algorithm is not limited to a single interferometer and can easily be used on other instruments\footnote{This is true for small field of view imaging. Wide field of view introduces additional effects that typically do not get modelled with a PSF}.
 
-CASA produces a the dirty image and the PSF for the VLA instrument.
-
 Note that the deconvolution problem is just one way of formulating the reconstruction. It was used in this project since the CASA interface was built for deconvolution algorithms. The same problem can be formulated as in-painting the missing Visibilities: If we apply the Fourier Transform to equation \eqref{intro:eq:deconvolve}, then the convolution turns to a multiplication and we arrive at a similar equation $X*M + N = V$. The Fourier Transform of $I_{dirty}$ is just the measured Visibilities $V$,  $PSF$ turns into a masking matrix $M$. $M$ is one for all measured Visibilities and zero everywhere else. If an algorithm can in-paint the missing Visibilities $X$, it has also found a solution $x$ to the deconvolution problem of \eqref{intro:eq:deconvolve}. In section \ref{cs:objective} the different formulations get discussed in more detail.
 
 
@@ -62,7 +60,7 @@ Compressed Sensing Image Reconstruction is a generalization of the CLEAN algorit
 As the prior function $p()$, CLEAN uses the L0 "norm". The optimization algorithm is similar to Matching Pursuit. In each iteration, Matching Pursuit searches the element in the regularization term that minimizes the objective the most. The objective of CLEAN can also be generalized into \eqref{intro:eq:csclean}. The objective still has a data and regularization term, but now the parameter $\lambda$ represents the trade-off between reconstructing close to the measurement and reconstructing a plausible image.
 
 \begin{equation}\label{intro:eq:csclean}
-\underset{x}{minimize} \: \left \| D_{dirty} - x \star PSF \right \|_2^2 \: + \: \lambda \: p(x) 
+\underset{x}{minimize} \: \left \| I_{dirty} - x \star PSF \right \|_2^2 \: + \: \lambda \: p(x) 
 \end{equation}
 
 CLEAN is similar to a Compressed Sensing Reconstruction consisting of the L0 "norm", matching pursuit and the objective \eqref{intro:eq:csclean}. But now, individual parts of the Compressed Sensing Reconstruction can be replaced. For example instead of the L0 "norm", one could use the L2 norm, or apply the Haar Transform and use the L0 "norm" on the Haar Wavelet coefficients of $x$. The prior function $p()$ can be chosen according to our prior knowledge and potentially super-resolve the image $x$.
