@@ -208,12 +208,16 @@ res.names <- gsub("\\.", "_", substring(basename(residuals), start.name+1, nchar
 mod.list <- read(models, resoultion)
 mod.names <- gsub("\\.", "_", substring(basename(models), start.name+1, nchar(basename(models))-4))
 
+
 #modify clean
 clean.img <-  data.matrix(img.list[["clean_image"]])
 clean.res <-  data.matrix(res.list[["clean_residual"]])
+clean.model.old <- data.matrix(mod.list[["clean_model"]])
 diff <- clean.img - clean.res
 mod.list[["clean_model"]] <- diff
 mod.list[["raw_model"]] <- data.matrix(img.list[["raw_image"]])
+mod.list[["clean_model_unconvolved"]] <- clean.model.old
+mod.names <- c(mod.names, "clean_model_unconvolved")
 
 #writePNGs(img.list, img.names, 300)
 #writePNGs(res.list,res.names, 300)
