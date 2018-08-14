@@ -75,8 +75,8 @@ dirty0 <- data.matrix(read.table("./data/ppt_clean/dirty0.csv", header = FALSE, 
 dMin <- min(dirty0)
 dMax <- max(dirty0)
 for(i in 0:5) {
-  name.csv <- paste("dirty", i-1,".csv", sep="")
-  name.png <- paste("dirty", i-1,".png", sep="")
+  name.csv <- paste("dirty", i,".csv", sep="")
+  name.png <- paste("dirty", i,".png", sep="")
   
   d <- data.matrix(read.table(paste("./data/ppt_clean/", name.csv, sep=""), header = FALSE, sep = ","))[1:32,1:32]
   printMap(name.png, d, dMin, dMax)
